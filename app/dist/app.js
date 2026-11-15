@@ -26882,17 +26882,27 @@
     measures: [],
     pendingMeasure: null,
     ghostOpacity: 0.35,
-    carConfig: "abituale"
+    carConfig: "abituale",
+    scanOnly: false,
+    // modalità "solo scansione"
+    scanCut: 2.15,
+    // quota di taglio della scansione (toglie il soffitto)
+    preset: "Stato attuale (rilievo)"
   };
+  var ghostLoaded = false;
   var history = [];
   var issues = [];
   var reach = null;
   var viewport = $("#viewport");
   var renderer = new WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.localClippingEnabled = true;
   viewport.appendChild(renderer.domElement);
   var scene = new Scene();
-  scene.background = new Color(15265008);
+  var BG_PROJECT = new Color(15330802);
+  var BG_SCAN = new Color(1316895);
+  scene.background = BG_PROJECT.clone();
+  var cutPlane = new Plane(new Vector3(0, -1, 0), state.scanCut);
   var persp = new PerspectiveCamera(50, 1, 0.05, 200);
   persp.position.set(4.5, 9.5, 14.5);
   var controls = new OrbitControls(persp, renderer.domElement);
@@ -27613,6 +27623,8 @@
       for (const mt of m.userData.mats) if (mt.emissive) mt.emissive.setHex(em);
     }
   }
+  var esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+  var icon = (id) => `<svg><use href="#i-${id}"/></svg>`;
   function renderIssues() {
     const el = $("#issues");
     const daily = state.objects.filter((o2) => o2.daily && o2.type !== "car");
@@ -27623,15 +27635,18 @@
         if (s && !s.onFoot) items.push({ sev: "err", msg: `Uso quotidiano NON raggiungibile: ${o2.name}`, id: o2.id });
       }
     }
-    $("#issueCount").textContent = items.length ? `(${items.length})` : "\u2713";
-    el.innerHTML = items.length ? items.map((i) => `<li class="${i.sev}" data-id="${i.id || ""}">${i.msg}</li>`).join("") : '<li class="ok">Nessun problema rilevato</li>';
+    const nErr = items.filter((i) => i.sev === "err").length, nWarn = items.length - nErr;
+    const sev = nErr ? "err" : items.length ? "warn" : "ok";
+    $("#issuesCard").className = `card status ${sev}`;
+    $("#issuesHead").innerHTML = `<span class="ico">${icon(sev === "ok" ? "check" : "alert")}</span><div>` + (sev === "ok" ? "<b>Nessun problema</b><small>Tutti i controlli dello spazio sono superati</small>" : `<b>${items.length} ${items.length === 1 ? "avviso" : "avvisi"}</b><small>${[nErr && `${nErr} ${nErr === 1 ? "grave" : "gravi"}`, nWarn && `${nWarn} da controllare`].filter(Boolean).join(" \xB7 ")}</small>`) + "</div>";
+    el.innerHTML = items.map((i) => `<li class="${i.sev}" data-id="${i.id || ""}">${esc(i.msg)}</li>`).join("");
     el.querySelectorAll("li[data-id]").forEach((li) => li.addEventListener("click", () => li.dataset.id && select(li.dataset.id)));
     renderScenario();
     renderList();
   }
   function renderScenario() {
     const box = $("#scenarioCars");
-    box.innerHTML = state.objects.filter((o2) => o2.type === "car").map((c) => `<label><input type="checkbox" data-car="${c.id}" ${state.carsOut[c.id] ? "checked" : ""}> ${c.name} fuori</label>`).join("");
+    box.innerHTML = state.objects.filter((o2) => o2.type === "car").map((c) => `<label class="sw"><input type="checkbox" data-car="${c.id}" ${state.carsOut[c.id] ? "checked" : ""}><i></i>${esc(c.name)} fuori</label>`).join("");
     box.querySelectorAll("input").forEach((i) => i.addEventListener("change", () => {
       state.carsOut[i.dataset.car] = i.checked;
       const c = state.objects.find((o2) => o2.id === i.dataset.car);
@@ -27640,21 +27655,23 @@
     }));
     const out = $("#scenarioResult");
     if (!state.scenario || !reach) {
-      out.innerHTML = '<p class="muted">Attiva la modalit\xE0 scenario per calcolare cosa \xE8 raggiungibile.</p>';
+      out.innerHTML = '<p class="hint">Attiva <b>Scenario</b> nella barra in basso per calcolare cosa \xE8 raggiungibile, anche con le auto fuori.</p>';
       return;
     }
     const rows = state.objects.filter((o2) => reach.status.has(o2.id) && (o2.kind === "moto" || o2.kind.startsWith("gancio") || o2.kind === "bici" || o2.daily || o2.kind === "rastrelliera"));
+    const yn = (v) => v === null ? '<span class="hint">\u2014</span>' : v ? '<span class="yes">\u2713</span>' : '<span class="no">\u2715</span>';
     out.innerHTML = "<table><tr><th>Oggetto</th><th>A piedi</th><th>Estraibile</th></tr>" + rows.map((o2) => {
       const s = reach.status.get(o2.id);
-      const e = s.extract === null ? "\u2014" : s.extract ? "\u2705" : "\u274C";
-      return `<tr data-id="${o2.id}"><td>${o2.name}${o2.daily ? " \u2605" : ""}</td><td>${s.onFoot ? "\u2705" : "\u274C"}</td><td>${e}</td></tr>`;
-    }).join("") + '</table><p class="muted">\u2605 = uso quotidiano. Estraibile = esiste un percorso largo quanto il mezzo (moto \u2265 80 cm, bici \u2265 76 cm) fino al portone, senza ruotare in spazi stretti.</p>';
+      return `<tr data-id="${o2.id}"><td>${esc(o2.name)}${o2.daily ? " \u2605" : ""}</td><td>${yn(s.onFoot)}</td><td>${yn(s.extract)}</td></tr>`;
+    }).join("") + `</table><p class="hint">\u2605 uso quotidiano. Estraibile = c'\xE8 un percorso largo quanto il mezzo (moto \u2265 80 cm, bici \u2265 76 cm) fino al portone, senza ruotare in spazi stretti.</p>`;
     out.querySelectorAll("tr[data-id]").forEach((tr) => tr.addEventListener("click", () => select(tr.dataset.id)));
   }
   function renderList() {
     const el = $("#objList");
-    el.innerHTML = state.objects.map((o2) => `<li data-id="${o2.id}" class="${state.selected === o2.id ? "sel" : ""}"><span class="sw" style="background:${o2.color}"></span>${o2.name}${o2.fixed ? " \u{1F512}" : ""}</li>`).join("");
-    el.querySelectorAll("li").forEach((li) => li.addEventListener("click", () => select(li.dataset.id)));
+    const q = ($("#objFilter").value || "").trim().toLowerCase();
+    const list = state.objects.filter((o2) => !q || o2.name.toLowerCase().includes(q) || o2.kind.includes(q));
+    el.innerHTML = list.length ? list.map((o2) => `<li data-id="${o2.id}" class="${state.selected === o2.id ? "sel" : ""}"><span class="swatch" style="background:${esc(o2.color)}"></span>${esc(o2.name)}${o2.fixed ? `<svg class="lock"><use href="#i-lock"/></svg>` : ""}</li>`).join("") : '<li class="hint">Nessun oggetto trovato</li>';
+    el.querySelectorAll("li[data-id]").forEach((li) => li.addEventListener("click", () => select(li.dataset.id)));
   }
   var PROPS = [
     ["name", "Nome", "text"],
@@ -27670,21 +27687,26 @@
     ["fixed", "Ancorato (non trascinabile)", "bool"],
     ["note", "Note", "text"]
   ];
+  var KIND_NAMES = { car: "Auto", moto: "Moto", bici: "Bici", scaffale: "Scaffale", armadio: "Armadio", mensola: "Mensola", gancio_v: "Gancio bici", gancio_o: "Supporto bici", rastrelliera: "Rastrelliera", soppalco: "Rack a soffitto", banco: "Banco", pannello: "Pannello", bidoni: "Bidoni", box: "Ingombro", zona: "Zona", corridoio: "Corridoio" };
   function renderProps() {
     const el = $("#props");
     const o2 = state.objects.find((x) => x.id === state.selected);
     if (!o2) {
-      el.innerHTML = `<p class="muted">Seleziona un oggetto (clic nella vista o nell'elenco).</p>`;
+      el.innerHTML = `<div class="empty-props">${icon("cube")}<span>Seleziona un oggetto nella vista<br>o nella scheda <b>Oggetti</b>.</span></div>`;
       return;
     }
-    el.innerHTML = PROPS.map(([k, lab, t]) => {
-      const v = o2[k] ?? (t === "num" ? 0 : "");
-      if (t === "bool") return `<label class="row"><input type="checkbox" data-k="${k}" ${v ? "checked" : ""}> ${lab}</label>`;
-      if (t === "color") return `<label class="row">${lab}<input type="color" data-k="${k}" value="${v}"></label>`;
-      if (t === "num") return `<label class="row">${lab}<input type="number" step="${k === "rot" ? 1 : 0.01}" data-k="${k}" value="${(+v).toFixed(k === "rot" ? 1 : 3)}"></label>`;
-      return `<label class="row">${lab}<input type="text" data-k="${k}" value="${String(v).replace(/"/g, "&quot;")}"></label>`;
-    }).join("") + `<p class="muted">Fonte: ${o2.src || "S"} \xB7 ${o2.kind}${o2.type === "car" ? ` \xB7 specchietti ${fmt(o2.mirrors)} m` : ""}</p>
-  <div class="btns"><button id="pDup">Duplica</button><button id="pWall">Appoggia a parete</button><button id="pDel" class="danger">Elimina</button></div>`;
+    const num = (k, lab, step = 0.01, dec = 3) => `<label>${lab}<input type="number" step="${step}" data-k="${k}" value="${(+(o2[k] ?? 0)).toFixed(dec)}"></label>`;
+    const sw = (k, lab) => `<label class="sw"><input type="checkbox" data-k="${k}" ${o2[k] ? "checked" : ""}><i></i>${lab}</label>`;
+    el.innerHTML = `
+    <div class="prop-head"><span class="swatch" style="background:${esc(o2.color)}"></span>
+      <div><b>${esc(o2.name)}</b><small>${KIND_NAMES[o2.kind] || o2.kind} \xB7 fonte ${esc(o2.src || "S")}${o2.type === "car" ? ` \xB7 specchietti ${fmt(o2.mirrors)} m` : ""}</small></div>
+      ${o2.fixed ? `<span class="lockpill">${icon("lock")}Ancorato</span>` : ""}</div>
+    <div class="pfull"><input type="text" data-k="name" value="${esc(o2.name)}" aria-label="Nome"><input type="color" data-k="color" value="${esc(o2.color)}" aria-label="Colore"></div>
+    <div class="pgroup"><span>Dimensioni (m)</span><div class="pgrid g4">${num("L", "Lungh.")}${num("P", "Prof.")}${num("H", "Altezza")}${num("elev", "Da terra")}</div></div>
+    <div class="pgroup"><span>Posizione</span><div class="pgrid">${num("x", "X (m)")}${num("z", "Z (m)")}${num("rot", "Rotaz. \xB0", 1, 1)}</div></div>
+    <div class="pgroup">${sw("daily", "Uso quotidiano")}${sw("fixed", "Ancorato (non trascinabile)")}</div>
+    <div class="pgroup"><span>Note</span><div class="pfull"><input type="text" data-k="note" value="${esc(o2.note)}" placeholder="Aggiungi una nota\u2026"></div></div>
+    <div class="pactions"><button id="pDup" class="btn">${icon("copy")}Duplica</button><button id="pWall" class="btn">${icon("wall")}A parete</button><button id="pDel" class="btn danger">${icon("trash")}Elimina</button></div>`;
     el.querySelectorAll("input").forEach((inp) => inp.addEventListener("change", () => {
       pushHistory();
       const k = inp.dataset.k, t = PROPS.find((p) => p[0] === k)[2];
@@ -27692,6 +27714,7 @@
       rebuildObject(o2);
       computeChecks();
       renderList();
+      if (k === "name" || k === "color" || k === "fixed") renderProps();
     }));
     $("#pDup").onclick = () => duplicate(o2);
     $("#pDel").onclick = () => removeObj(o2);
@@ -27826,10 +27849,11 @@
     }
     if (state.mode === "measure") {
       const targets = [roomGroup, objGroup, doorGroup, ghostRoot].filter((g) => g.visible);
-      const h = ray.intersectObjects(targets, true).find((x) => x.object.type === "Mesh" && x.object.visible);
+      const h = ray.intersectObjects(targets, true).find((x) => x.object.type === "Mesh" && x.object.visible && !(x.object.userData.ghost && x.point.y > state.scanCut));
       if (h) addMeasurePoint(h.point.clone());
       return;
     }
+    if (state.scanOnly) return;
     const o2 = pickObject();
     if (o2) {
       if (state.selected !== o2.id) select(o2.id);
@@ -28026,7 +28050,7 @@
       if (sx < -50 || sy < -20 || sx > w + 50 || sy > h + 20) return;
       html += `<div class="lbl ${cls || ""}" style="left:${sx}px;top:${sy}px">${text}</div>`;
     };
-    if (state.showLabels) {
+    if (state.showLabels && !state.scanOnly) {
       for (const o2 of state.objects) {
         if (o2.kind === "corridoio") continue;
         const y = state.view === "top" ? 0 : (o2.elev || 0) + o2.H + 0.1;
@@ -28061,22 +28085,39 @@
     gltfScene.traverse((c) => {
       if (c.isMesh) {
         c.material = c.material.clone();
-        c.material.transparent = true;
-        c.material.opacity = state.ghostOpacity;
-        c.material.depthWrite = false;
         c.material.side = DoubleSide;
+        c.material.clippingPlanes = [cutPlane];
+        c.userData.ghost = true;
         c.renderOrder = 1;
       }
     });
     ghostRoot.add(outer);
-    ghostRoot.visible = $("#ghostOn").checked;
-    setStatus("Scansione caricata \u2713 (attivala con \u201CScansione GLB (fantasma)\u201D)");
+    ghostLoaded = true;
+    applyGhostLook();
+    ghostRoot.visible = state.scanOnly || $("#ghostOn").checked;
+    $("#scanEmpty").hidden = true;
+    $("#ghostInfo").textContent = "Scansione caricata \u2713 \xB7 accendila con \u201CScansione\u201D nella barra in basso.";
+    setStatus(state.scanOnly ? "Scansione caricata \u2713" : "Scansione caricata \u2713 \xB7 accendila con \u201CScansione\u201D o apri \u201CSolo scansione\u201D");
+  }
+  function applyGhostLook() {
+    ghostRoot.traverse((c) => {
+      if (!c.isMesh) return;
+      const m = c.material, solidLook = state.scanOnly;
+      m.transparent = !solidLook;
+      m.opacity = solidLook ? 1 : state.ghostOpacity;
+      m.depthWrite = solidLook;
+      m.needsUpdate = true;
+    });
   }
   function setGhostOpacity(v) {
     state.ghostOpacity = v;
-    ghostRoot.traverse((c) => {
-      if (c.isMesh) c.material.opacity = v;
-    });
+    applyGhostLook();
+  }
+  function setScanCut(v) {
+    state.scanCut = v;
+    cutPlane.constant = v;
+    $("#scanCut").value = v;
+    $("#scanCutVal").textContent = `${fmt(v)} m`;
   }
   function loadGhostFromBuffer(buf) {
     setStatus("Lettura GLB\u2026");
@@ -28084,21 +28125,26 @@
   }
   function tryAutoLoadGhost() {
     if (!location.protocol.startsWith("http")) {
-      setStatus("Aperto da file: usa \u201CCarica GLB\u2026\u201D per la scansione (oppure avvia il server locale).");
+      $("#ghostInfo").textContent = "App aperta da file: carica garage.glb con il pulsante qui sopra (oppure avvia avvia.bat).";
       return;
     }
-    setStatus("Caricamento scansione dal server\u2026");
+    $("#ghostInfo").textContent = "Caricamento della scansione\u2026";
     const tryUrl = (urls) => {
       if (!urls.length) {
-        setStatus("garage.glb non trovato sul server: usa \u201CCarica GLB\u2026\u201D.");
+        $("#ghostInfo").textContent = "garage.glb non trovato sul server: caricalo con il pulsante qui sopra.";
         return;
       }
       loader.load(urls[0], (g) => setGhost(g.scene), void 0, () => tryUrl(urls.slice(1)));
     };
     tryUrl(["../garage.glb", "./garage.glb"]);
   }
+  var toastTimer = 0;
   function setStatus(t) {
-    $("#status").textContent = t;
+    const el = $("#toast");
+    el.textContent = t;
+    el.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove("show"), 3200);
   }
   function download(name, blobOrUrl) {
     const a = document.createElement("a");
@@ -28120,9 +28166,11 @@
       state.objects = d.objects;
       state.measures = d.measures || [];
       state.carConfig = d.carConfig || "abituale";
-      $("#carCfg").value = state.carConfig;
+      syncCarSeg();
       state.carsOut = d.carsOut || {};
       state.doorOpen = !!d.doorOpen;
+      state.preset = null;
+      renderPresets();
       $("#doorOpen").checked = state.doorOpen;
       buildDoor();
       rebuildAll();
@@ -28155,10 +28203,19 @@
     });
     download(`garage-${state.view}-${Date.now()}.png`, c.toDataURL("image/png"));
   }
+  var CAR_INFO = {
+    abituale: ["Auto: disposizione abituale", "Q2 davanti al portone, Mini e BMW affiancate come al solito."],
+    ottimale: ["Auto: disposizione ottimale", "Q2 pi\xF9 verso le moto, Mini e BMW pi\xF9 distanziate (~86 cm tra le portiere)."],
+    video: ["Auto: disposizione del video", "Come nel video: Mini davanti al portone, Q2 nel posto lato nord."]
+  };
+  function syncCarSeg() {
+    document.querySelectorAll("#carSeg button").forEach((b) => b.classList.toggle("on", b.dataset.cfg === state.carConfig));
+    $("#carDesc").textContent = (CAR_INFO[state.carConfig] || ["", ""])[1];
+  }
   function setCarConfig(cfg) {
     pushHistory();
     state.carConfig = cfg;
-    $("#carCfg").value = cfg;
+    syncCarSeg();
     const sl = CAR_SLOTS[cfg];
     for (const o2 of state.objects) if (o2.type === "car" && sl[o2.name]) {
       Object.assign(o2, sl[o2.name]);
@@ -28166,27 +28223,69 @@
     }
     computeChecks();
     renderProps();
-    setStatus({ abituale: "Auto: disposizione abituale (Q2 davanti al portone)", ottimale: "Auto: disposizione ottimale (Q2 verso le moto, Mini e BMW pi\xF9 distanziate)", video: "Auto: disposizione del video (Mini davanti al portone)" }[cfg]);
+    setStatus(CAR_INFO[cfg][0]);
+  }
+  var PRESET_INFO = {
+    "Stato attuale (rilievo)": ["\u2022", "Stato attuale", "Com'\xE8 oggi il box, ricostruito dalla scansione."],
+    "Proposta A \u2013 Riordino economico": ["A", "Riordino economico", "Spesa minima: scaffali nuovi, bici appese al muro, rack a soffitto."],
+    "Proposta B \u2013 Officina vicino al portone": ["B", "Officina vicino al portone", "Banco da lavoro sul lato sud, bici e scaffali sul lato est."],
+    "Proposta C \u2013 Parete attrezzata + armadi chiusi": ["C", "Parete attrezzata + armadi", "Armadi chiusi sul lato sud, banco e attrezzi sulla parete est."]
+  };
+  function renderPresets() {
+    const el = $("#presetList");
+    el.innerHTML = Object.keys(PRESETS).map((k) => {
+      const [b, t, d] = PRESET_INFO[k] || ["\u2022", k, ""];
+      return `<button class="preset${state.preset === k ? " on" : ""}" data-k="${esc(k)}"><span class="badge">${b}</span><b>${esc(t)}</b><span>${esc(d)}</span></button>`;
+    }).join("");
+    el.querySelectorAll(".preset").forEach((p) => p.onclick = () => loadPreset(p.dataset.k));
   }
   function loadPreset(name) {
     pushHistory();
     state.objects = PRESETS[name](state.carConfig);
     state.carsOut = {};
     state.selected = null;
+    state.preset = name;
     rebuildAll();
     renderProps();
     computeChecks();
-    setStatus(`Caricato: ${name}`);
+    renderPresets();
+    setStatus(`Caricato: ${(PRESET_INFO[name] || [, name])[1]} \xB7 Ctrl+Z per tornare indietro`);
   }
   function setView(v) {
-    state.view = v;
+    const wasScan = state.scanOnly;
+    state.scanOnly = v === "scan";
+    state.view = v === "top" ? "top" : "3d";
     $("#v3d").classList.toggle("on", v === "3d");
     $("#vTop").classList.toggle("on", v === "top");
-    controls.enabled = v === "3d";
-    roomGroup.getObjectByName("ceiling").visible = v === "3d";
-    if (v === "top") fitTop();
+    $("#vScan").classList.toggle("on", v === "scan");
+    document.body.classList.toggle("scan-mode", state.scanOnly);
+    controls.enabled = state.view === "3d";
+    roomGroup.visible = !state.scanOnly && $("#roomOn").checked;
+    objGroup.visible = checkGroup.visible = doorGroup.visible = !state.scanOnly;
+    ghostRoot.visible = state.scanOnly || $("#ghostOn").checked;
+    roomGroup.getObjectByName("ceiling").visible = state.view === "3d";
+    scene.background.copy(state.scanOnly ? BG_SCAN : BG_PROJECT);
+    applyGhostLook();
+    $("#scanEmpty").hidden = !(state.scanOnly && !ghostLoaded);
+    if (state.scanOnly) {
+      state.selected = null;
+      renderProps();
+    }
+    if (wasScan !== state.scanOnly) resize();
+    if (state.view === "top") fitTop();
     buildDoor();
     updateOrtho();
+    if (state.scanOnly && !wasScan) setStatus("Solo scansione: la scansione 3D reale, senza ricostruzione");
+  }
+  function resetView() {
+    if (state.view === "top") {
+      fitTop();
+      updateOrtho();
+      return;
+    }
+    persp.position.set(4.5, 9.5, 14.5);
+    controls.target.set(6.6, 0.5, 3);
+    controls.update();
   }
   function fitTop() {
     const r = renderer.domElement.getBoundingClientRect(), asp = r.width / Math.max(1, r.height);
@@ -28237,36 +28336,63 @@
     $("#scenarioOn").onchange = (e) => {
       state.scenario = e.target.checked;
       computeChecks();
+      setStatus(e.target.checked ? "Scenario attivo: verde = raggiungibile, rosso = irraggiungibile" : "Scenario disattivato");
     };
     $("#ghostOn").onchange = (e) => {
-      ghostRoot.visible = e.target.checked;
+      ghostRoot.visible = e.target.checked || state.scanOnly;
+      if (e.target.checked && !ghostLoaded) setStatus("Scansione non ancora caricata: caricala dalla scheda Vista");
     };
     $("#ghostOp").oninput = (e) => setGhostOpacity(parseFloat(e.target.value));
     $("#roomOn").onchange = (e) => {
-      roomGroup.visible = e.target.checked;
+      roomGroup.visible = e.target.checked && !state.scanOnly;
     };
-    $("#glbFile").onchange = (e) => {
+    document.querySelectorAll(".glbFile").forEach((inp) => inp.onchange = (e) => {
       const f = e.target.files[0];
       if (f) f.arrayBuffer().then(loadGhostFromBuffer);
       e.target.value = "";
+    });
+    $("#vScan").onclick = () => setView("scan");
+    $("#scanBack").onclick = () => setView("3d");
+    $("#scanCut").oninput = (e) => setScanCut(parseFloat(e.target.value));
+    document.querySelectorAll(".resetView").forEach((b) => b.onclick = resetView);
+    $("#save").onclick = () => {
+      saveJSON();
+      setStatus("Layout salvato in layout-garage.json");
     };
-    $("#save").onclick = saveJSON;
     $("#jsonFile").onchange = (e) => {
       const f = e.target.files[0];
       if (f) f.text().then(loadJSON);
       e.target.value = "";
     };
-    $("#shot").onclick = screenshot;
-    $("#carCfg").onchange = (e) => setCarConfig(e.target.value);
-    $("#undo").onclick = undo;
-    const ps = $("#preset");
-    ps.innerHTML = Object.keys(PRESETS).map((k) => `<option>${k}</option>`).join("");
-    $("#loadPreset").onclick = () => {
-      if (confirm(`Caricare "${ps.value}"? Il layout corrente verr\xE0 sostituito (puoi annullare con Ctrl+Z).`)) loadPreset(ps.value);
+    $("#shot").onclick = () => {
+      screenshot();
+      setStatus("Screenshot scaricato");
     };
-    $("#lib").innerHTML = LIBRARY.map((it, i) => `<button data-i="${i}" title="${it.L}\xD7${it.P}\xD7${it.H} m \xB7 ${it.price}">+ ${it.name}</button>`).join("");
-    $("#lib").querySelectorAll("button").forEach((b) => b.onclick = () => addFromLibrary(LIBRARY[+b.dataset.i]));
-    document.querySelectorAll(".panel h3").forEach((h) => h.addEventListener("click", () => h.parentElement.classList.toggle("closed")));
+    document.querySelectorAll("#carSeg button").forEach((b) => b.onclick = () => {
+      if (b.dataset.cfg !== state.carConfig) setCarConfig(b.dataset.cfg);
+    });
+    $("#undo").onclick = undo;
+    renderPresets();
+    $("#lib").innerHTML = LIBRARY.map((it, i) => `<button data-i="${i}" title="Aggiungi ${esc(it.name)}"><span class="swatch" style="background:${it.color}"></span><span><b>${esc(it.name)}</b><small>${fmt(it.L)} \xD7 ${fmt(it.P)} \xD7 ${fmt(it.H)} m</small></span>${it.price !== "\u2014" ? `<em>${it.price}</em>` : "<span></span>"}</button>`).join("");
+    $("#lib").querySelectorAll("button").forEach((b) => b.onclick = () => {
+      addFromLibrary(LIBRARY[+b.dataset.i]);
+      setStatus(`Aggiunto: ${LIBRARY[+b.dataset.i].name}`);
+    });
+    $("#objFilter").oninput = renderList;
+    document.querySelectorAll(".tab").forEach((t) => t.onclick = () => {
+      document.querySelectorAll(".tab").forEach((x) => x.classList.toggle("on", x === t));
+      document.querySelectorAll(".tabpane").forEach((p) => p.classList.toggle("on", p.dataset.pane === t.dataset.tab));
+    });
+    document.querySelectorAll(".card.collapsible h3").forEach((h) => h.addEventListener("click", () => h.parentElement.classList.toggle("closed")));
+    $("#helpBtn").onclick = (e) => {
+      e.stopPropagation();
+      $("#help").hidden = !$("#help").hidden;
+    };
+    document.addEventListener("pointerdown", (e) => {
+      if (!$("#help").hidden && !e.target.closest("#help, #helpBtn")) $("#help").hidden = true;
+    });
+    syncCarSeg();
+    setScanCut(state.scanCut);
   }
   function resize() {
     const w = viewport.clientWidth, h = viewport.clientHeight;
@@ -28279,6 +28405,7 @@
   function loop() {
     requestAnimationFrame(loop);
     if (state.view === "3d") controls.update();
+    if (reachMesh) reachMesh.visible = !state.scanOnly;
     renderer.render(scene, cam());
     updateLabels();
   }
@@ -28294,7 +28421,7 @@
   drawMeasures();
   tryAutoLoadGhost();
   loop();
-  window.garage = { state, computeChecks, loadPreset, objGroup, roomGroup, ghostRoot, setGhostOpacity, select, setView, persp, controls, setCarConfig };
+  window.garage = { state, computeChecks, loadPreset, objGroup, roomGroup, ghostRoot, setGhostOpacity, select, setView, persp, controls, setCarConfig, setScanCut };
 })();
 /**
  * @license

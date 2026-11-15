@@ -18,6 +18,10 @@
 npx esbuild app/src/main.js --bundle --format=iife --alias:three=./app/lib/three/three.module.js --outfile=app/dist/app.js
 ```
 
+## Modalità
+- **Progetto 3D / Pianta 2D:** il box ricostruito con auto, moto, mobili, proposte e controlli dello spazio.
+- **Solo scansione:** solo la scansione 3D reale (garage.glb), senza ricostruzione. Il cursore “Taglio soffitto” toglie il soffitto per guardare dentro; la misura funziona anche sulla scansione.
+
 ## Comandi
 - Mouse sinistro: seleziona e trascina (in 3D, sul vuoto ruota la vista).
 - Mouse destro: sposta la vista. Rotella: zoom.

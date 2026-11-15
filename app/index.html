@@ -4,88 +4,214 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Garage 3D – riordino box</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M5 11 12 6l7 5v7H5zM8 18v-4h8v4' fill='none' stroke='white' stroke-width='1.8' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<header>
-  <strong>Garage 3D</strong>
-  <div class="seg"><button id="v3d" class="on">Vista 3D</button><button id="vTop">Pianta 2D</button></div>
-  <button id="mMeasure" title="Clic su due punti per misurare">📏 Misura</button>
-  <select id="carCfg" title="Disposizione delle auto"><option value="abituale">Auto: abituale (Q2 al portone)</option><option value="ottimale">Auto: ottimale (più spazio tra le auto)</option><option value="video">Auto: come nel video (Mini al portone)</option></select>
-  <label class="tog"><input type="checkbox" id="doorOpen"> Portone aperto</label>
-  <label class="tog"><input type="checkbox" id="scenarioOn"> Modalità scenario</label>
-  <span class="sp"></span>
-  <button id="undo" title="Ctrl+Z">↶ Annulla</button>
-  <button id="save">💾 Salva JSON</button>
-  <label class="btn">📂 Carica JSON<input type="file" id="jsonFile" accept=".json,application/json" hidden></label>
-  <button id="shot">📷 Screenshot</button>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-logo" viewBox="0 0 24 24"><path d="M3 10.5 12 4l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M7 21v-7h10v7M7 17h10"/></symbol>
+    <symbol id="i-cube" viewBox="0 0 24 24"><path d="M12 3 4 7.5v9L12 21l8-4.5v-9z"/><path d="M4 7.5 12 12l8-4.5M12 12v9"/></symbol>
+    <symbol id="i-plan" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M3 12h7v8M14 4v6h7"/></symbol>
+    <symbol id="i-scan" viewBox="0 0 24 24"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M12 7.5 8 9.8v4.4l4 2.3 4-2.3V9.8z"/></symbol>
+    <symbol id="i-ruler" viewBox="0 0 24 24"><path d="M3 16.5 16.5 3 21 7.5 7.5 21z"/><path d="m7 13 2 2M10 10l2 2M13 7l2 2"/></symbol>
+    <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></symbol>
+    <symbol id="i-save" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></symbol>
+    <symbol id="i-open" viewBox="0 0 24 24"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 21h14"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r=".8"/><circle cx="4.5" cy="12" r=".8"/><circle cx="4.5" cy="18" r=".8"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></symbol>
+    <symbol id="i-door" viewBox="0 0 24 24"><path d="M4 21V4h16v17"/><path d="M4 8h16M4 12h16M4 16h16"/></symbol>
+    <symbol id="i-route" viewBox="0 0 24 24"><circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 18h7a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h7"/></symbol>
+    <symbol id="i-tag" viewBox="0 0 24 24"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.2"/></symbol>
+    <symbol id="i-ghost" viewBox="0 0 24 24"><path d="M5 20V10a7 7 0 0 1 14 0v10l-2.5-2-2.3 2-2.2-2-2.2 2-2.3-2z"/><circle cx="9.5" cy="10.5" r=".9"/><circle cx="14.5" cy="10.5" r=".9"/></symbol>
+    <symbol id="i-focus" viewBox="0 0 24 24"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4"/><circle cx="12" cy="12" r="2.5"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17.2v.1"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4 2.5 20h19z"/><path d="M12 10v4.5M12 17.3v.1"/></symbol>
+    <symbol id="i-car" viewBox="0 0 24 24"><path d="M5 16V11l2-5h10l2 5v5"/><path d="M3 16h18v3H3zM5 11h14"/><circle cx="7.5" cy="19" r="1.5"/><circle cx="16.5" cy="19" r="1.5"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></symbol>
+    <symbol id="i-wall" viewBox="0 0 24 24"><path d="M20 3v18"/><rect x="6" y="8" width="10" height="8" rx="1"/><path d="m13 12 3 0"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+    <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></symbol>
+  </defs>
+</svg>
+
+<header id="topbar">
+  <div class="brand">
+    <span class="logo"><svg><use href="#i-logo"/></svg></span>
+    <div><strong>Garage 3D</strong><small>Riordino del box</small></div>
+  </div>
+
+  <nav class="seg seg-main" aria-label="Modalità di visualizzazione">
+    <button id="v3d" class="on" title="Progetto in 3D"><svg><use href="#i-cube"/></svg><span>Progetto 3D</span></button>
+    <button id="vTop" title="Pianta dall'alto"><svg><use href="#i-plan"/></svg><span>Pianta 2D</span></button>
+    <button id="vScan" title="Solo la scansione 3D reale, senza ricostruzione"><svg><use href="#i-scan"/></svg><span>Solo scansione</span></button>
+  </nav>
+
+  <div class="tools">
+    <button id="mMeasure" class="tbtn" title="Misura: clic su due punti"><svg><use href="#i-ruler"/></svg><span>Misura</span></button>
+    <button id="undo" class="tbtn" title="Annulla (Ctrl+Z)"><svg><use href="#i-undo"/></svg><span>Annulla</span></button>
+    <span class="vsep"></span>
+    <button id="save" class="tbtn" title="Salva il layout in un file JSON"><svg><use href="#i-save"/></svg><span>Salva</span></button>
+    <label class="tbtn" title="Apri un layout JSON salvato"><svg><use href="#i-open"/></svg><span>Apri</span><input type="file" id="jsonFile" accept=".json,application/json" hidden></label>
+    <button id="shot" class="tbtn primary" title="Scarica un'immagine PNG della vista"><svg><use href="#i-camera"/></svg><span>Screenshot</span></button>
+  </div>
 </header>
 
 <aside id="left">
-  <section class="panel">
-    <h3>Proposte / layout</h3>
-    <select id="preset"></select>
-    <button id="loadPreset">Carica</button>
-  </section>
-  <section class="panel">
-    <h3>Libreria elementi</h3>
-    <div id="lib" class="lib"></div>
-    <p class="muted">Gli elementi a parete si appoggiano e si allineano al muro più vicino. Poi modifica le misure a destra.</p>
-  </section>
-  <section class="panel">
-    <h3>Visualizzazione</h3>
-    <label class="row">Griglia snap
-      <select id="grid"><option value="0">off</option><option value="0.01">1 cm</option><option value="0.05" selected>5 cm</option><option value="0.1">10 cm</option></select></label>
-    <label><input type="checkbox" id="wallSnap" checked> Snap alle pareti (Alt = disattiva)</label>
-    <label><input type="checkbox" id="labelsOn" checked> Etichette</label>
-    <label><input type="checkbox" id="doorVol" checked> Volume portone aperto</label>
-    <label><input type="checkbox" id="roomOn" checked> Modello pulito</label>
-    <hr>
-    <label><input type="checkbox" id="ghostOn"> Scansione GLB (fantasma)</label>
-    <label class="row">Opacità <input type="range" id="ghostOp" min="0.05" max="1" step="0.05" value="0.35"></label>
-    <label class="btn">Carica GLB…<input type="file" id="glbFile" accept=".glb,.gltf" hidden></label>
-  </section>
-  <section class="panel">
-    <h3>Controlli spazio</h3>
-    <label><input type="checkbox" id="chk_collisions" checked> Collisioni</label>
-    <label><input type="checkbox" id="chk_doors" checked> Portiere 70 cm / bagagliaio 80 cm</label>
-    <label><input type="checkbox" id="chk_corridors" checked> Corridoi 80 cm</label>
-    <label><input type="checkbox" id="chk_panel" checked> Accesso quadro elettrico</label>
-  </section>
-  <section class="panel">
-    <h3>Oggetti</h3>
-    <ul id="objList" class="list"></ul>
-  </section>
+  <div class="tabs" role="tablist">
+    <button class="tab on" data-tab="layout"><svg><use href="#i-layers"/></svg>Layout</button>
+    <button class="tab" data-tab="add"><svg><use href="#i-plus"/></svg>Aggiungi</button>
+    <button class="tab" data-tab="objects"><svg><use href="#i-list"/></svg>Oggetti</button>
+    <button class="tab" data-tab="view"><svg><use href="#i-sliders"/></svg>Vista</button>
+  </div>
+
+  <div class="tabpane on" data-pane="layout">
+    <section class="card">
+      <h3>Disposizione auto</h3>
+      <div class="seg seg-full" id="carSeg">
+        <button data-cfg="abituale">Abituale</button>
+        <button data-cfg="ottimale">Ottimale</button>
+        <button data-cfg="video">Video</button>
+      </div>
+      <p class="hint" id="carDesc"></p>
+    </section>
+    <section class="card">
+      <h3>Proposte</h3>
+      <div id="presetList" class="presets"></div>
+      <p class="hint">Caricare una proposta sostituisce il layout: puoi sempre tornare indietro con <kbd>Ctrl</kbd>+<kbd>Z</kbd>.</p>
+    </section>
+  </div>
+
+  <div class="tabpane" data-pane="add">
+    <section class="card">
+      <h3>Libreria elementi</h3>
+      <div id="lib" class="lib"></div>
+      <p class="hint">Gli elementi a parete si appoggiano al muro più vicino. Poi modifica le misure nel pannello Proprietà.</p>
+    </section>
+  </div>
+
+  <div class="tabpane" data-pane="objects">
+    <section class="card">
+      <div class="search"><svg><use href="#i-search"/></svg><input id="objFilter" type="search" placeholder="Cerca oggetto…"></div>
+      <ul id="objList" class="list"></ul>
+    </section>
+  </div>
+
+  <div class="tabpane" data-pane="view">
+    <section class="card">
+      <h3>Modifica</h3>
+      <label class="field">Griglia snap
+        <select id="grid"><option value="0">off</option><option value="0.01">1 cm</option><option value="0.05" selected>5 cm</option><option value="0.1">10 cm</option></select></label>
+      <label class="sw"><input type="checkbox" id="wallSnap" checked><i></i>Snap alle pareti <small>(Alt = disattiva)</small></label>
+    </section>
+    <section class="card">
+      <h3>Elementi visibili</h3>
+      <label class="sw"><input type="checkbox" id="roomOn" checked><i></i>Stanza ricostruita</label>
+      <label class="sw"><input type="checkbox" id="doorVol" checked><i></i>Volume del portone aperto</label>
+    </section>
+    <section class="card">
+      <h3>Scansione 3D sovrapposta</h3>
+      <label class="field">Opacità <input type="range" id="ghostOp" min="0.05" max="1" step="0.05" value="0.35"></label>
+      <label class="btn block"><svg><use href="#i-open"/></svg>Carica file GLB…<input type="file" class="glbFile" accept=".glb,.gltf" hidden></label>
+      <p class="hint" id="ghostInfo">Accendi la scansione dalla barra in basso nella vista.</p>
+    </section>
+    <section class="card">
+      <h3>Controlli dello spazio</h3>
+      <label class="sw"><input type="checkbox" id="chk_collisions" checked><i></i>Collisioni</label>
+      <label class="sw"><input type="checkbox" id="chk_doors" checked><i></i>Portiere 70 cm · bagagliaio 80 cm</label>
+      <label class="sw"><input type="checkbox" id="chk_corridors" checked><i></i>Corridoi 80 cm</label>
+      <label class="sw"><input type="checkbox" id="chk_panel" checked><i></i>Accesso quadro elettrico</label>
+    </section>
+  </div>
 </aside>
 
-<main id="viewport"><div id="labels"></div><div id="status"></div>
-  <div id="help">Sinistro: seleziona/trascina · ruota vista (3D) · Destro: sposta vista · R ruota 90° · Q/E ±15° (Shift ±1°) · Frecce sposta 1 cm (Shift 10) · Canc elimina · Ctrl+D duplica</div>
+<main id="viewport">
+  <div id="labels"></div>
+  <div id="toast" role="status"></div>
+
+  <div id="scanEmpty" class="empty" hidden>
+    <svg><use href="#i-scan"/></svg>
+    <h2>Scansione non caricata</h2>
+    <p>Avvia l'app con <b>avvia.bat</b> per caricarla in automatico, oppure scegli il file <b>garage.glb</b>.</p>
+    <label class="btn primary"><svg><use href="#i-open"/></svg>Carica garage.glb…<input type="file" class="glbFile" accept=".glb,.gltf" hidden></label>
+  </div>
+
+  <div class="floatbar" id="barProject">
+    <label class="chip"><input type="checkbox" id="doorOpen"><svg><use href="#i-door"/></svg>Portone aperto</label>
+    <label class="chip"><input type="checkbox" id="scenarioOn"><svg><use href="#i-route"/></svg>Scenario</label>
+    <label class="chip"><input type="checkbox" id="labelsOn" checked><svg><use href="#i-tag"/></svg>Etichette</label>
+    <label class="chip"><input type="checkbox" id="ghostOn"><svg><use href="#i-ghost"/></svg>Scansione</label>
+    <span class="vsep"></span>
+    <button class="ibtn resetView" title="Centra la vista"><svg><use href="#i-focus"/></svg></button>
+  </div>
+
+  <div class="floatbar" id="barScan">
+    <button class="chip back" id="scanBack"><svg><use href="#i-arrow-left"/></svg>Torna al progetto</button>
+    <span class="vsep"></span>
+    <label class="slider">Taglio soffitto <input type="range" id="scanCut" min="0.3" max="2.6" step="0.05" value="2.15"><output id="scanCutVal">2,15 m</output></label>
+    <span class="vsep"></span>
+    <button class="ibtn resetView" title="Centra la vista"><svg><use href="#i-focus"/></svg></button>
+  </div>
+
+  <button id="helpBtn" class="ibtn round" title="Comandi"><svg><use href="#i-help"/></svg></button>
+  <div id="help" class="popover" hidden>
+    <h4>Comandi</h4>
+    <dl>
+      <dt>Clic sinistro</dt><dd>seleziona e trascina · sul vuoto ruota la vista</dd>
+      <dt>Clic destro</dt><dd>sposta la vista</dd>
+      <dt>Rotella</dt><dd>zoom</dd>
+      <dt><kbd>R</kbd></dt><dd>ruota di 90°</dd>
+      <dt><kbd>Q</kbd> <kbd>E</kbd></dt><dd>ruota ±15° (con <kbd>Shift</kbd> ±1°)</dd>
+      <dt>Frecce</dt><dd>sposta 1 cm (con <kbd>Shift</kbd> 10 cm)</dd>
+      <dt><kbd>Alt</kbd></dt><dd>trascina senza snap alle pareti</dd>
+      <dt><kbd>Ctrl</kbd>+<kbd>Z</kbd></dt><dd>annulla</dd>
+      <dt><kbd>Ctrl</kbd>+<kbd>D</kbd></dt><dd>duplica</dd>
+      <dt><kbd>Canc</kbd></dt><dd>elimina</dd>
+      <dt><kbd>Esc</kbd></dt><dd>deseleziona / esci dalla misura</dd>
+    </dl>
+  </div>
 </main>
 
 <aside id="right">
-  <section class="panel">
+  <section class="card status" id="issuesCard">
+    <div class="status-head" id="issuesHead"></div>
+    <ul id="issues" class="issues"></ul>
+  </section>
+  <section class="card">
     <h3>Proprietà</h3>
     <div id="props"></div>
   </section>
-  <section class="panel">
-    <h3>Avvisi <span id="issueCount"></span></h3>
-    <ul id="issues" class="issues"></ul>
-  </section>
-  <section class="panel">
+  <section class="card collapsible">
     <h3>Scenario</h3>
-    <div id="scenarioCars" class="cars"></div>
-    <div id="scenarioResult"></div>
+    <div class="body">
+      <div id="scenarioCars" class="cars"></div>
+      <div id="scenarioResult"></div>
+    </div>
   </section>
-  <section class="panel">
+  <section class="card collapsible">
     <h3>Misure</h3>
-    <ul id="measList" class="list"></ul>
-    <button id="measClear">Cancella misure</button>
+    <div class="body">
+      <ul id="measList" class="list meas"></ul>
+      <button id="measClear" class="btn small">Cancella misure</button>
+    </div>
   </section>
-  <section class="panel closed">
+  <section class="card collapsible closed">
     <h3>Legenda e precisione</h3>
-    <p class="muted">[P] planimetria geometra · [M] misurato su scan (±3–5 cm) · [F] dato di fabbrica · [S] stimato.<br>
-    Verde = spazio OK · Rosso = spazio insufficiente/ostruito · Arancio = bagagliaio o volume portone aperto.<br>
-    In modalità scenario: area verde a pavimento = percorribile a piedi (≥ 50 cm). Tinta degli oggetti: verde raggiungibile/estraibile, arancio solo a piedi, rosso irraggiungibile.</p>
+    <div class="body">
+      <ul class="legend">
+        <li><span class="dot" style="--c:var(--ok)"></span>Spazio sufficiente</li>
+        <li><span class="dot" style="--c:var(--err)"></span>Spazio insufficiente o ostruito</li>
+        <li><span class="dot" style="--c:var(--warn)"></span>Bagagliaio o volume del portone aperto</li>
+      </ul>
+      <p class="hint">Fonti delle misure: <b>[P]</b> planimetria · <b>[M]</b> misurato su scan (±3–5 cm) · <b>[F]</b> dato di fabbrica · <b>[S]</b> stimato.</p>
+      <p class="hint">In modalità scenario l'area verde a pavimento è percorribile a piedi (≥ 50 cm). Oggetti: verde raggiungibile/estraibile, arancio solo a piedi, rosso irraggiungibile.</p>
+    </div>
   </section>
 </aside>
 
