@@ -1,0 +1,23 @@
+{
+  "_nota": "Rilievo Fase 1. Sistema di riferimento: origine = angolo nord-ovest interno (parete portone / parete ovest), X verso est lungo il lato lungo, Z verso sud (verso l'interno), Y verso l'alto. Metri. Scan Scaniverse ruotato di +1.1 gradi; trasformazione scan->locale: X = (x*cos(1.1)-z*sin(1.1)) + 6.62 ; Z = (x*sin(1.1)+z*cos(1.1)) + 2.10 ; Y = y - 0.008",
+  "scala": { "fattore_applicato": 1.0, "riferimento": "Audi Q2 2021: L 4208 / H 1508 mm", "scan": "L 4186 / H 1509 mm", "scarto_lunghezza_pct": -0.5, "scarto_altezza_pct": 0.1 },
+  "stanza": {
+    "lunghezza_X": { "valore": 13.20, "a_nord": 13.10, "a_sud": 13.31, "precisione": "+-0.08 (parete ovest fuori squadro o deriva scan)" },
+    "profondita_Z": { "valore": 5.88, "precisione": "+-0.04" },
+    "altezza": { "valore": 2.31, "precisione": "+-0.03", "pendenza_soffitto_cm_m": 0.5 },
+    "pavimento_pendenza_cm_m": 0.15
+  },
+  "portone_sezionale": {
+    "parete": "nord", "manto_X": [0.12, 4.37], "manto_larghezza": 4.25, "manto_altezza": 2.25,
+    "vano_stimato": { "larghezza": [4.10, 4.15], "altezza": [2.15, 2.20], "confidenza": "media" },
+    "binari_orizzontali": { "quota": 2.27, "profondita_da_parete": 2.55, "X": [0.12, 4.37] },
+    "motore": { "guida_X": 2.22, "fine_guida_Z": 2.55, "confidenza": "media" }
+  },
+  "porta_casa": { "parete": "nord", "X": [11.11, 12.23], "confidenza": "alta" },
+  "quadro_elettrico": { "parete": "nord", "X": [4.41, 4.95], "Y": [1.40, 1.87], "prese_Y": [1.10, 0.40], "confidenza": "alta" },
+  "auto": {
+    "Mini":  { "centro": [2.76, 2.64], "yaw_deg": 87.8, "muso": "nord", "scan_LxWxH": [3.56, 1.65, 1.39], "X": [1.93, 3.58], "Z": [0.85, 4.42] },
+    "Q2":    { "centro": [7.15, 1.72], "yaw_deg": 0.3, "muso": "ovest", "scan_LxWxH": [4.19, 1.77, 1.51], "X": [5.05, 9.24], "Z": [0.84, 2.60] },
+    "BMW":   { "centro": [6.88, 4.08], "yaw_deg": -4.5, "muso": "ovest", "scan_LxWxH": [4.28, 1.70, 1.39], "X": [4.74, 9.01], "Z": [3.23, 4.93] }
+  }
+}

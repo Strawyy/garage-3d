@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Garage 3D – riordino box</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header>
+  <strong>Garage 3D</strong>
+  <div class="seg"><button id="v3d" class="on">Vista 3D</button><button id="vTop">Pianta 2D</button></div>
+  <button id="mMeasure" title="Clic su due punti per misurare">📏 Misura</button>
+  <select id="carCfg" title="Disposizione delle auto"><option value="abituale">Auto: abituale (Q2 al portone)</option><option value="ottimale">Auto: ottimale (più spazio tra le auto)</option><option value="video">Auto: come nel video (Mini al portone)</option></select>
+  <label class="tog"><input type="checkbox" id="doorOpen"> Portone aperto</label>
+  <label class="tog"><input type="checkbox" id="scenarioOn"> Modalità scenario</label>
+  <span class="sp"></span>
+  <button id="undo" title="Ctrl+Z">↶ Annulla</button>
+  <button id="save">💾 Salva JSON</button>
+  <label class="btn">📂 Carica JSON<input type="file" id="jsonFile" accept=".json,application/json" hidden></label>
+  <button id="shot">📷 Screenshot</button>
+</header>
+
+<aside id="left">
+  <section class="panel">
+    <h3>Proposte / layout</h3>
+    <select id="preset"></select>
+    <button id="loadPreset">Carica</button>
+  </section>
+  <section class="panel">
+    <h3>Libreria elementi</h3>
+    <div id="lib" class="lib"></div>
+    <p class="muted">Gli elementi a parete si appoggiano e si allineano al muro più vicino. Poi modifica le misure a destra.</p>
+  </section>
+  <section class="panel">
+    <h3>Visualizzazione</h3>
+    <label class="row">Griglia snap
+      <select id="grid"><option value="0">off</option><option value="0.01">1 cm</option><option value="0.05" selected>5 cm</option><option value="0.1">10 cm</option></select></label>
+    <label><input type="checkbox" id="wallSnap" checked> Snap alle pareti (Alt = disattiva)</label>
+    <label><input type="checkbox" id="labelsOn" checked> Etichette</label>
+    <label><input type="checkbox" id="doorVol" checked> Volume portone aperto</label>
+    <label><input type="checkbox" id="roomOn" checked> Modello pulito</label>
+    <hr>
+    <label><input type="checkbox" id="ghostOn"> Scansione GLB (fantasma)</label>
+    <label class="row">Opacità <input type="range" id="ghostOp" min="0.05" max="1" step="0.05" value="0.35"></label>
+    <label class="btn">Carica GLB…<input type="file" id="glbFile" accept=".glb,.gltf" hidden></label>
+  </section>
+  <section class="panel">
+    <h3>Controlli spazio</h3>
+    <label><input type="checkbox" id="chk_collisions" checked> Collisioni</label>
+    <label><input type="checkbox" id="chk_doors" checked> Portiere 70 cm / bagagliaio 80 cm</label>
+    <label><input type="checkbox" id="chk_corridors" checked> Corridoi 80 cm</label>
+    <label><input type="checkbox" id="chk_panel" checked> Accesso quadro elettrico</label>
+  </section>
+  <section class="panel">
+    <h3>Oggetti</h3>
+    <ul id="objList" class="list"></ul>
+  </section>
+</aside>
+
+<main id="viewport"><div id="labels"></div><div id="status"></div>
+  <div id="help">Sinistro: seleziona/trascina · ruota vista (3D) · Destro: sposta vista · R ruota 90° · Q/E ±15° (Shift ±1°) · Frecce sposta 1 cm (Shift 10) · Canc elimina · Ctrl+D duplica</div>
+</main>
+
+<aside id="right">
+  <section class="panel">
+    <h3>Proprietà</h3>
+    <div id="props"></div>
+  </section>
+  <section class="panel">
+    <h3>Avvisi <span id="issueCount"></span></h3>
+    <ul id="issues" class="issues"></ul>
+  </section>
+  <section class="panel">
+    <h3>Scenario</h3>
+    <div id="scenarioCars" class="cars"></div>
+    <div id="scenarioResult"></div>
+  </section>
+  <section class="panel">
+    <h3>Misure</h3>
+    <ul id="measList" class="list"></ul>
+    <button id="measClear">Cancella misure</button>
+  </section>
+  <section class="panel closed">
+    <h3>Legenda e precisione</h3>
+    <p class="muted">[P] planimetria geometra · [M] misurato su scan (±3–5 cm) · [F] dato di fabbrica · [S] stimato.<br>
+    Verde = spazio OK · Rosso = spazio insufficiente/ostruito · Arancio = bagagliaio o volume portone aperto.<br>
+    In modalità scenario: area verde a pavimento = percorribile a piedi (≥ 50 cm). Tinta degli oggetti: verde raggiungibile/estraibile, arancio solo a piedi, rosso irraggiungibile.</p>
+  </section>
+</aside>
+
+<script src="dist/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+:root { --bg: #f5f6f8; --panel: #ffffff; --line: #d9dde3; --ink: #1f2933; --muted: #6b7785; --acc: #1f6feb; --err: #d63031; --warn: #e17d00; --ok: #1e8449; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; font: 13px/1.4 system-ui, "Segoe UI", sans-serif; color: var(--ink); background: var(--bg); }
+body { display: grid; grid-template: 44px 1fr / 260px 1fr 300px; grid-template-areas: "h h h" "l v r"; height: 100vh; overflow: hidden; }
+header { grid-area: h; display: flex; align-items: center; gap: 8px; padding: 0 10px; background: #1f2933; color: #fff; }
+header strong { margin-right: 8px; }
+header .sp { flex: 1; }
+header .tog { display: flex; align-items: center; gap: 4px; }
+button, .btn { font: inherit; padding: 4px 9px; border: 1px solid var(--line); border-radius: 6px; background: #fff; color: var(--ink); cursor: pointer; display: inline-block; }
+header button, header .btn { background: #323f4b; color: #fff; border-color: #46525e; }
+button.on { background: var(--acc) !important; color: #fff !important; border-color: var(--acc) !important; }
+button.danger { color: var(--err); }
+.seg button { border-radius: 0; } .seg button:first-child { border-radius: 6px 0 0 6px; } .seg button:last-child { border-radius: 0 6px 6px 0; }
+aside { overflow-y: auto; padding: 8px; background: var(--bg); }
+#left { grid-area: l; border-right: 1px solid var(--line); }
+#right { grid-area: r; border-left: 1px solid var(--line); }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; }
+.panel h3 { margin: 0 0 6px; font-size: 13px; cursor: pointer; user-select: none; }
+.panel h3::before { content: "▾ "; color: var(--muted); }
+.panel.closed h3::before { content: "▸ "; }
+.panel.closed > :not(h3) { display: none; }
+.panel label { display: block; margin: 3px 0; }
+.panel label.row { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+.panel input[type=number], .panel input[type=text] { width: 120px; padding: 2px 4px; border: 1px solid var(--line); border-radius: 4px; font: inherit; }
+.panel select { font: inherit; max-width: 100%; }
+#preset { width: 100%; margin-bottom: 6px; }
+.lib { display: flex; flex-direction: column; gap: 3px; }
+.lib button { text-align: left; }
+.muted { color: var(--muted); font-size: 12px; }
+.list { list-style: none; margin: 0; padding: 0; max-height: 280px; overflow-y: auto; }
+.list li { padding: 2px 4px; border-radius: 4px; cursor: pointer; }
+.list li:hover { background: #eef2f7; } .list li.sel { background: #dbe8ff; }
+.sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; border: 1px solid #0003; }
+.issues { list-style: none; margin: 0; padding: 0; max-height: 260px; overflow-y: auto; }
+.issues li { padding: 3px 6px; margin: 2px 0; border-left: 3px solid; border-radius: 3px; cursor: pointer; background: #fafafa; }
+.issues li.err { border-color: var(--err); } .issues li.warn { border-color: var(--warn); } .issues li.ok { border-color: var(--ok); }
+.btns { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+.cars label { display: block; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 6px; }
+td, th { padding: 2px 4px; border-bottom: 1px solid var(--line); text-align: left; }
+tr[data-id] { cursor: pointer; } tr[data-id]:hover { background: #eef2f7; }
+#viewport { grid-area: v; position: relative; overflow: hidden; background: #e8ecf0; }
+#viewport canvas { display: block; }
+#labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.lbl { position: absolute; transform: translate(-50%, -50%); background: rgba(255,255,255,.85); padding: 0 5px; border-radius: 4px; font-size: 11px; white-space: nowrap; border: 1px solid #0001; }
+.lbl.sel { background: #ffb000; color: #000; font-weight: 600; }
+.lbl.zone { background: rgba(255,255,255,.55); font-weight: 600; font-size: 12px; }
+.lbl.door { background: #5a3a22; color: #fff; }
+.lbl.dim { background: transparent; border: none; color: #333; font-weight: 600; }
+.lbl.meas { background: #d35400; color: #fff; font-weight: 600; }
+#status { position: absolute; left: 8px; top: 8px; background: rgba(31,41,51,.8); color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 12px; }
+#help { position: absolute; left: 8px; bottom: 8px; right: 8px; color: #445; font-size: 11px; background: rgba(255,255,255,.7); padding: 3px 6px; border-radius: 4px; }
+hr { border: none; border-top: 1px solid var(--line); margin: 6px 0; }
