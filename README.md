@@ -1,5 +1,8 @@
 # Garage 3D – riordino del box
 
+## Online
+https://strawyy.github.io/garage-3d/ (GitHub Pages). All'apertura chiede un codice a 4 cifre: è solo una protezione di facciata, il sito è statico.
+
 ## Avvio
 - **Consigliato:** doppio clic su `avvia.bat`. Avvia un server locale (Node, o Python se presente) e apre http://localhost:8000/app/ . La scansione `garage.glb` viene caricata automaticamente.
 - **Manuale:** `node server.js` (oppure `python -m http.server 8000`) in questa cartella, poi apri http://localhost:8000/app/
