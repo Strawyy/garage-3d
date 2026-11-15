@@ -26767,6 +26767,11 @@
   var mtbV = (n, x, daily = true) => o({ name: n, kind: "gancio_v", x, z: 5.42, L: 0.45, P: 1.15, H: 1.9, color: daily ? "#2d8a4e" : "#7fa88c", daily, note: "Bici appesa in verticale (ruota anteriore al gancio)." });
   var PRESETS = {
     "Stato attuale (rilievo)": (cfg) => currentLayout(cfg),
+    // Proposta vuota: solo le tre auto (nella disposizione scelta), tutto il resto da aggiungere a mano
+    "Proposta vuota \u2013 Da zero": (cfg) => {
+      _id = 500;
+      return [...carObjects(cfg)];
+    },
     "Proposta A \u2013 Riordino economico": (cfg) => {
       _id = 200;
       return [
@@ -28227,6 +28232,7 @@
   }
   var PRESET_INFO = {
     "Stato attuale (rilievo)": ["\u2022", "Stato attuale", "Com'\xE8 oggi il box, ricostruito dalla scansione."],
+    "Proposta vuota \u2013 Da zero": ["0", "Da zero", "Solo le tre auto: aggiungi tu tutto il resto dalla scheda Aggiungi."],
     "Proposta A \u2013 Riordino economico": ["A", "Riordino economico", "Spesa minima: scaffali nuovi, bici appese al muro, rack a soffitto."],
     "Proposta B \u2013 Officina vicino al portone": ["B", "Officina vicino al portone", "Banco da lavoro sul lato sud, bici e scaffali sul lato est."],
     "Proposta C \u2013 Parete attrezzata + armadi chiusi": ["C", "Parete attrezzata + armadi", "Armadi chiusi sul lato sud, banco e attrezzi sulla parete est."]

@@ -144,6 +144,9 @@ const mtbV = (n, x, daily = true) => o({ name: n, kind: 'gancio_v', x, z: 5.42, 
 export const PRESETS = {
   'Stato attuale (rilievo)': (cfg) => currentLayout(cfg),
 
+  // Proposta vuota: solo le tre auto (nella disposizione scelta), tutto il resto da aggiungere a mano
+  'Proposta vuota – Da zero': (cfg) => { _id = 500; return [...carObjects(cfg)]; },
+
   'Proposta A – Riordino economico': (cfg) => { _id = 200; return [
     ...carObjects(cfg), ...motos(), ...defaultChecks(),
     zone('Zona moto', 0.9, 2.7, 1.3, 4.6, '#e74c3c'),
