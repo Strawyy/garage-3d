@@ -27644,6 +27644,10 @@
     const sev = nErr ? "err" : items.length ? "warn" : "ok";
     $("#issuesCard").className = `card status ${sev}`;
     $("#issuesHead").innerHTML = `<span class="ico">${icon(sev === "ok" ? "check" : "alert")}</span><div>` + (sev === "ok" ? "<b>Nessun problema</b><small>Tutti i controlli dello spazio sono superati</small>" : `<b>${items.length} ${items.length === 1 ? "avviso" : "avvisi"}</b><small>${[nErr && `${nErr} ${nErr === 1 ? "grave" : "gravi"}`, nWarn && `${nWarn} da controllare`].filter(Boolean).join(" \xB7 ")}</small>`) + "</div>";
+    const nb = $("#navBadge");
+    nb.hidden = !items.length;
+    nb.textContent = items.length;
+    nb.className = "nbadge" + (nErr ? " err" : "");
     el.innerHTML = items.map((i) => `<li class="${i.sev}" data-id="${i.id || ""}">${esc(i.msg)}</li>`).join("");
     el.querySelectorAll("li[data-id]").forEach((li) => li.addEventListener("click", () => li.dataset.id && select(li.dataset.id)));
     renderScenario();
@@ -27676,7 +27680,10 @@
     const q = ($("#objFilter").value || "").trim().toLowerCase();
     const list = state.objects.filter((o2) => !q || o2.name.toLowerCase().includes(q) || o2.kind.includes(q));
     el.innerHTML = list.length ? list.map((o2) => `<li data-id="${o2.id}" class="${state.selected === o2.id ? "sel" : ""}"><span class="swatch" style="background:${esc(o2.color)}"></span>${esc(o2.name)}${o2.fixed ? `<svg class="lock"><use href="#i-lock"/></svg>` : ""}</li>`).join("") : '<li class="hint">Nessun oggetto trovato</li>';
-    el.querySelectorAll("li[data-id]").forEach((li) => li.addEventListener("click", () => select(li.dataset.id)));
+    el.querySelectorAll("li[data-id]").forEach((li) => li.addEventListener("click", () => {
+      select(li.dataset.id);
+      if (isMobile()) openSheet("info");
+    }));
   }
   var PROPS = [
     ["name", "Nome", "text"],
@@ -27709,6 +27716,7 @@
     <div class="pfull"><input type="text" data-k="name" value="${esc(o2.name)}" aria-label="Nome"><input type="color" data-k="color" value="${esc(o2.color)}" aria-label="Colore"></div>
     <div class="pgroup"><span>Dimensioni (m)</span><div class="pgrid g4">${num("L", "Lungh.")}${num("P", "Prof.")}${num("H", "Altezza")}${num("elev", "Da terra")}</div></div>
     <div class="pgroup"><span>Posizione</span><div class="pgrid">${num("x", "X (m)")}${num("z", "Z (m)")}${num("rot", "Rotaz. \xB0", 1, 1)}</div></div>
+    ${o2.fixed ? "" : `<div class="pgroup"><span>Ruota</span><div class="protate"><button class="btn" data-rot="-90">${icon("rot-l")}90\xB0</button><button class="btn" data-rot="-15">${icon("rot-l")}15\xB0</button><button class="btn" data-rot="15">${icon("rot-r")}15\xB0</button><button class="btn" data-rot="90">${icon("rot-r")}90\xB0</button></div></div>`}
     <div class="pgroup">${sw("daily", "Uso quotidiano")}${sw("fixed", "Ancorato (non trascinabile)")}</div>
     <div class="pgroup"><span>Note</span><div class="pfull"><input type="text" data-k="note" value="${esc(o2.note)}" placeholder="Aggiungi una nota\u2026"></div></div>
     <div class="pactions"><button id="pDup" class="btn">${icon("copy")}Duplica</button><button id="pWall" class="btn">${icon("wall")}A parete</button><button id="pDel" class="btn danger">${icon("trash")}Elimina</button></div>`;
@@ -27721,6 +27729,7 @@
       renderList();
       if (k === "name" || k === "color" || k === "fixed") renderProps();
     }));
+    el.querySelectorAll("[data-rot]").forEach((b) => b.onclick = () => rotateObj(o2, +b.dataset.rot));
     $("#pDup").onclick = () => duplicate(o2);
     $("#pDel").onclick = () => removeObj(o2);
     $("#pWall").onclick = () => {
@@ -27733,6 +27742,10 @@
   }
   function select(id) {
     state.selected = id;
+    if (id && isMobile() && !document.body.classList.contains("sheet-open")) {
+      const o2 = state.objects.find((x) => x.id === id);
+      if (o2) setStatus(`${o2.name} \xB7 tocca Info per modificarlo`);
+    }
     renderProps();
     renderList();
     computeChecks();
@@ -27918,6 +27931,15 @@
     if (ix) ix.value = o2.x.toFixed(3);
     if (iz) iz.value = o2.z.toFixed(3);
   }
+  function rotateObj(o2, d) {
+    if (o2.fixed) return;
+    pushHistory();
+    o2.rot = ((o2.rot + d) % 360 + 360) % 360;
+    if (o2.rot > 180) o2.rot -= 360;
+    syncTransform(o2);
+    computeChecks();
+    renderProps();
+  }
   var checkPending = false;
   function scheduleChecks() {
     if (checkPending) return;
@@ -27944,15 +27966,7 @@
       return;
     }
     if (!o2) return;
-    const rotate = (d) => {
-      if (o2.fixed) return;
-      pushHistory();
-      o2.rot = ((o2.rot + d) % 360 + 360) % 360;
-      if (o2.rot > 180) o2.rot -= 360;
-      syncTransform(o2);
-      computeChecks();
-      renderProps();
-    };
+    const rotate = (d) => rotateObj(o2, d);
     if (ev.key === "r" || ev.key === "R") rotate(90);
     if (ev.key === "q" || ev.key === "Q") rotate(ev.shiftKey ? -1 : -15);
     if (ev.key === "e" || ev.key === "E") rotate(ev.shiftKey ? 1 : 15);
@@ -27980,8 +27994,9 @@
   }
   function doPan(ev) {
     const h = renderer.domElement.clientHeight, k = 2 * top.half / h;
-    top.cx = pan.cx - (ev.clientX - pan.x) * k;
-    top.cz = pan.cz - (ev.clientY - pan.y) * k;
+    const { R, D } = topAxes(), dx = (ev.clientX - pan.x) * k, dy = (ev.clientY - pan.y) * k;
+    top.cx = pan.cx - dx * R[0] - dy * D[0];
+    top.cz = pan.cz - dx * R[1] - dy * D[1];
     updateOrtho();
   }
   renderer.domElement.addEventListener("wheel", (ev) => {
@@ -27989,20 +28004,61 @@
     ev.preventDefault();
     const r = renderer.domElement.getBoundingClientRect(), asp = r.width / r.height;
     const mx = (ev.clientX - r.left) / r.width * 2 - 1, my = (ev.clientY - r.top) / r.height * 2 - 1;
-    const wx = top.cx + mx * top.half * asp, wz = top.cz + my * top.half;
+    const { R, D } = topAxes(), off = (h) => [mx * h * asp * R[0] + my * h * D[0], mx * h * asp * R[1] + my * h * D[1]];
+    const o0 = off(top.half), wx = top.cx + o0[0], wz = top.cz + o0[1];
     const f = ev.deltaY > 0 ? 1.12 : 1 / 1.12;
     top.half = Math.min(12, Math.max(0.6, top.half * f));
-    top.cx = wx - mx * top.half * asp;
-    top.cz = wz - my * top.half;
+    const o1 = off(top.half);
+    top.cx = wx - o1[0];
+    top.cz = wz - o1[1];
     updateOrtho();
   }, { passive: false });
+  var touches = /* @__PURE__ */ new Map();
+  var pinch = null;
+  renderer.domElement.addEventListener("pointerdown", (ev) => {
+    if (ev.pointerType !== "touch") return;
+    touches.set(ev.pointerId, [ev.clientX, ev.clientY]);
+    if (touches.size === 2 && state.view === "top") {
+      const [a, b] = [...touches.values()];
+      pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]), half: top.half };
+      pan = null;
+      if (drag) {
+        drag = null;
+        history.pop();
+      }
+    }
+  });
+  renderer.domElement.addEventListener("pointermove", (ev) => {
+    if (!touches.has(ev.pointerId)) return;
+    touches.set(ev.pointerId, [ev.clientX, ev.clientY]);
+    if (pinch && touches.size === 2) {
+      const [a, b] = [...touches.values()];
+      top.half = Math.min(12, Math.max(0.6, pinch.half * pinch.d / Math.max(10, Math.hypot(a[0] - b[0], a[1] - b[1]))));
+      updateOrtho();
+    }
+  });
+  var endTouch = (ev) => {
+    touches.delete(ev.pointerId);
+    if (touches.size < 2) pinch = null;
+  };
+  window.addEventListener("pointerup", endTouch);
+  window.addEventListener("pointercancel", endTouch);
   renderer.domElement.addEventListener("contextmenu", (e) => e.preventDefault());
+  function isPortrait() {
+    const r = renderer.domElement.getBoundingClientRect();
+    return r.width / Math.max(1, r.height) < 0.85;
+  }
+  function topAxes() {
+    return isPortrait() ? { R: [0, -1], D: [1, 0] } : { R: [1, 0], D: [0, 1] };
+  }
   function updateOrtho() {
     const r = renderer.domElement.getBoundingClientRect(), asp = r.width / Math.max(1, r.height);
     ortho.left = -top.half * asp;
     ortho.right = top.half * asp;
     ortho.top = top.half;
     ortho.bottom = -top.half;
+    if (isPortrait()) ortho.up.set(-1, 0, 0);
+    else ortho.up.set(0, 0, -1);
     ortho.position.set(top.cx, 30, top.cz);
     ortho.lookAt(top.cx, 0, top.cz);
     ortho.updateProjectionMatrix();
@@ -28255,6 +28311,7 @@
     renderProps();
     computeChecks();
     renderPresets();
+    closeSheets();
     setStatus(`Caricato: ${(PRESET_INFO[name] || [, name])[1]} \xB7 Ctrl+Z per tornare indietro`);
   }
   function setView(v) {
@@ -28289,15 +28346,25 @@
       updateOrtho();
       return;
     }
-    persp.position.set(4.5, 9.5, 14.5);
-    controls.target.set(6.6, 0.5, 3);
+    if (isPortrait()) {
+      persp.position.set(19.5, 14.5, 9.5);
+      controls.target.set(6.4, 0.3, 3);
+    } else {
+      persp.position.set(4.5, 9.5, 14.5);
+      controls.target.set(6.6, 0.5, 3);
+    }
     controls.update();
   }
   function fitTop() {
     const r = renderer.domElement.getBoundingClientRect(), asp = r.width / Math.max(1, r.height);
-    top.cx = 6.66;
     top.cz = 3;
-    top.half = Math.max(3.9, 7.6 / asp);
+    if (isPortrait()) {
+      top.cx = 6.66 + 0.35;
+      top.half = Math.max(8, 3.9 / asp);
+    } else {
+      top.cx = 6.66;
+      top.half = Math.max(3.9, 7.6 / asp);
+    }
   }
   function setMode(m) {
     state.mode = m;
@@ -28361,15 +28428,17 @@
     $("#scanBack").onclick = () => setView("3d");
     $("#scanCut").oninput = (e) => setScanCut(parseFloat(e.target.value));
     document.querySelectorAll(".resetView").forEach((b) => b.onclick = resetView);
-    $("#save").onclick = () => {
+    document.querySelectorAll(".saveBtn").forEach((b) => b.onclick = () => {
       saveJSON();
       setStatus("Layout salvato in layout-garage.json");
-    };
-    $("#jsonFile").onchange = (e) => {
+    });
+    document.querySelectorAll(".jsonFile").forEach((inp) => inp.onchange = (e) => {
       const f = e.target.files[0];
       if (f) f.text().then(loadJSON);
       e.target.value = "";
-    };
+      closeSheets();
+    });
+    wireMobile();
     $("#shot").onclick = () => {
       screenshot();
       setStatus("Screenshot scaricato");
@@ -28382,6 +28451,7 @@
     $("#lib").innerHTML = LIBRARY.map((it, i) => `<button data-i="${i}" title="Aggiungi ${esc(it.name)}"><span class="swatch" style="background:${it.color}"></span><span><b>${esc(it.name)}</b><small>${fmt(it.L)} \xD7 ${fmt(it.P)} \xD7 ${fmt(it.H)} m</small></span>${it.price !== "\u2014" ? `<em>${it.price}</em>` : "<span></span>"}</button>`).join("");
     $("#lib").querySelectorAll("button").forEach((b) => b.onclick = () => {
       addFromLibrary(LIBRARY[+b.dataset.i]);
+      closeSheets();
       setStatus(`Aggiunto: ${LIBRARY[+b.dataset.i].name}`);
     });
     $("#objFilter").oninput = renderList;
@@ -28399,6 +28469,47 @@
     });
     syncCarSeg();
     setScanCut(state.scanCut);
+  }
+  var mq = window.matchMedia("(max-width: 760px)");
+  var isMobile = () => mq.matches;
+  function closeSheets() {
+    if (!isMobile()) return;
+    document.querySelectorAll("aside.sheet").forEach((s) => s.classList.remove("open"));
+    document.body.classList.remove("sheet-open");
+    document.querySelectorAll("#mnav button").forEach((b) => b.classList.toggle("on", b.dataset.go === "scene"));
+  }
+  function openSheet(go) {
+    if (go === "scene") {
+      closeSheets();
+      return;
+    }
+    const left = go !== "info";
+    $("#left").classList.toggle("open", left);
+    $("#right").classList.toggle("open", !left);
+    if (left) document.querySelector(`.tab[data-tab="${go}"]`).click();
+    document.body.classList.add("sheet-open");
+    document.querySelectorAll("#mnav button").forEach((b) => b.classList.toggle("on", b.dataset.go === go));
+  }
+  function wireMobile() {
+    document.querySelectorAll("#mnav button").forEach((b) => b.onclick = () => {
+      const isOpen = b.classList.contains("on") && b.dataset.go !== "scene";
+      if (isOpen) closeSheets();
+      else openSheet(b.dataset.go);
+    });
+    document.querySelectorAll(".sheet-close").forEach((b) => b.onclick = closeSheets);
+    $("#scrim").onclick = closeSheets;
+    document.querySelectorAll(".tab").forEach((t) => t.addEventListener("click", () => {
+      if (isMobile() && $("#left").classList.contains("open")) document.querySelectorAll("#mnav button").forEach((b) => b.classList.toggle("on", b.dataset.go === t.dataset.tab));
+    }));
+    mq.addEventListener("change", () => {
+      document.querySelectorAll("aside.sheet").forEach((s) => s.classList.remove("open"));
+      document.body.classList.remove("sheet-open");
+      resize();
+    });
+    if (isMobile()) {
+      $("#labelsOn").checked = false;
+      state.showLabels = false;
+    }
   }
   function resize() {
     const w = viewport.clientWidth, h = viewport.clientHeight;
@@ -28506,6 +28617,7 @@
   wireUI();
   resize();
   setView("3d");
+  resetView();
   renderProps();
   computeChecks();
   drawMeasures();

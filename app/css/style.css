@@ -342,3 +342,108 @@ body.locked > :not(.lock):not(svg) { filter: blur(8px); pointer-events: none; us
 .pin.good input { border-color: #4ade80; }
 .lock-card .lock-err { color: #fca5a5; font-size: 12.5px; min-height: 18px; }
 @keyframes shake { 0%,100% { transform: none; } 20%,60% { transform: translateX(-8px); } 40%,80% { transform: translateX(8px); } }
+
+/* ---------- elementi solo mobile (nascosti su desktop) ---------- */
+.btnrow { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.sheet-head, #mnav, #scrim { display: none; }
+.protate { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.protate .btn { height: 32px; padding: 0 4px; font-size: 12px; gap: 4px; }
+.protate svg { width: 14px; height: 14px; }
+
+/* =====================================================================
+   VERSIONE MOBILE (telefono)
+   ===================================================================== */
+@media (max-width: 760px) {
+  :root { --top: 52px; --nav: 60px; }
+  html, body { height: 100%; }
+  body {
+    height: 100dvh; font-size: 14px;
+    grid-template: var(--top) 1fr calc(var(--nav) + env(safe-area-inset-bottom)) / 1fr;
+    grid-template-areas: "h" "v" "n";
+  }
+
+  /* barra superiore compatta */
+  #topbar { gap: 8px; padding: 0 10px; }
+  .brand { min-width: 0; gap: 0; }
+  .brand > div { display: none; }
+  .brand .logo { width: 32px; height: 32px; }
+  .seg-main { flex: 1; justify-content: center; max-width: 220px; margin: 0 auto; }
+  .seg-main button { flex: 1; padding: 0 8px; height: 32px; }
+  .seg-main span { display: none; }
+  .tools { margin-left: 0; gap: 0; }
+  .tools .vsep, #save, .tools label.tbtn { display: none; }
+  .tbtn { padding: 0 8px; height: 36px; }
+  .tbtn span { display: none; }
+
+  /* barra di navigazione in basso */
+  #mnav {
+    grid-area: n; display: grid; grid-template-columns: repeat(5, 1fr); z-index: 30;
+    padding-bottom: env(safe-area-inset-bottom); background: var(--surface); border-top: 1px solid var(--line);
+  }
+  #mnav button {
+    position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+    border: 0; background: transparent; color: var(--muted); font-size: 11px; font-weight: 500; -webkit-tap-highlight-color: transparent;
+  }
+  #mnav button svg { width: 22px; height: 22px; }
+  #mnav button.on { color: var(--acc); }
+  #mnav button.on::before { content: ""; position: absolute; top: 0; left: 30%; right: 30%; height: 3px; border-radius: 0 0 3px 3px; background: var(--acc); }
+  .nbadge {
+    position: absolute; top: 5px; left: calc(50% + 6px); min-width: 17px; height: 17px; padding: 0 4px; border-radius: 99px;
+    background: var(--warn); color: #fff; font-size: 10px; font-weight: 700; line-height: 17px; text-align: center;
+  }
+  .nbadge.err { background: var(--err); }
+  .nbadge[hidden] { display: none; }
+
+  /* pannelli → fogli che salgono dal basso */
+  aside.sheet {
+    position: fixed; left: 0; right: 0; bottom: calc(var(--nav) + env(safe-area-inset-bottom)); z-index: 20;
+    max-height: min(68dvh, 620px); padding: 0 12px 12px; border: 0 !important;
+    background: var(--bg); border-radius: 18px 18px 0 0; box-shadow: 0 -12px 40px rgba(16,24,40,.22);
+    transform: translateY(calc(100% + var(--nav) + 20px)); transition: transform .28s cubic-bezier(.2,.8,.2,1); visibility: hidden;
+    overscroll-behavior: contain;
+  }
+  aside.sheet.open { transform: none; visibility: visible; }
+  .sheet-head {
+    position: sticky; top: 0; z-index: 3; display: flex; align-items: center; justify-content: space-between; height: 40px;
+    margin: 0 -12px; padding: 0 8px 0 16px; background: var(--bg);
+  }
+  .sheet-head b { font-size: 15px; }
+  .sheet-head .grab { position: absolute; left: 50%; top: 7px; width: 38px; height: 4px; margin-left: -19px; border-radius: 99px; background: #cfd4dc; }
+  .sheet-head .sheet-close { margin-left: auto; }
+  #left .tabs { top: 40px; padding-top: 0; }
+  #scrim { position: fixed; inset: 0; z-index: 15; background: rgba(16,24,40,.25); opacity: 0; pointer-events: none; transition: opacity .25s; display: block; bottom: calc(var(--nav) + env(safe-area-inset-bottom)); }
+  body.sheet-open #scrim { opacity: 1; pointer-events: auto; }
+
+  /* card e controlli più comodi al tocco */
+  .card { padding: 14px; }
+  .preset { padding: 12px; }
+  .lib button { padding: 11px 10px; }
+  .list li { padding: 10px 8px; }
+  .sw { margin: 12px 0; }
+  .pgrid input, .pfull input[type=text], .field select { height: 38px; font-size: 15px; }
+  .pgrid.g4 { grid-template-columns: repeat(2, 1fr); }
+  .issues { max-height: none; }
+
+  /* vista */
+  .floatbar {
+    left: 8px; right: 8px; bottom: 10px; transform: none; overflow-x: auto; scrollbar-width: none; justify-content: flex-start;
+    border-radius: 14px; padding: 4px;
+  }
+  .floatbar::-webkit-scrollbar { display: none; }
+  .chip { height: 36px; padding: 0 10px; font-size: 13px; flex: none; }
+  #helpBtn, #help { display: none; }
+  #toast { top: 10px; max-width: calc(100% - 24px); font-size: 12px; white-space: normal; text-align: center; border-radius: 14px; }
+  .lbl { font-size: 10px; padding: 1px 5px; }
+  .lbl.zone { font-size: 10px; }
+  .slider { padding: 0 6px; gap: 6px; flex: 1; min-width: 0; font-size: 13px; }
+  .slider input { width: auto; flex: 1; min-width: 80px; }
+  .slider output { min-width: 44px; }
+  #scanBack span, #barScan .vsep { display: none; }
+  .empty { padding: 22px 18px; }
+
+  /* modalità solo scansione: niente navigazione in basso */
+  body.scan-mode { grid-template-columns: 1fr; grid-template-rows: var(--top) 1fr 0; }
+  body.scan-mode #mnav { display: none; }
+  body.scan-mode aside.sheet { display: none; }
+  body.scan-mode .seg-main { margin-right: auto; }
+}

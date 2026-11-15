@@ -37,6 +37,10 @@
     <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></symbol>
     <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
     <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.1"/></symbol>
+    <symbol id="i-rot-l" viewBox="0 0 24 24"><path d="M4 4v5h5"/><path d="M4.5 9A8 8 0 1 1 6 17"/></symbol>
+    <symbol id="i-rot-r" viewBox="0 0 24 24"><path d="M20 4v5h-5"/><path d="M19.5 9A8 8 0 1 0 18 17"/></symbol>
     <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></symbol>
   </defs>
 </svg>
@@ -57,13 +61,14 @@
     <button id="mMeasure" class="tbtn" title="Misura: clic su due punti"><svg><use href="#i-ruler"/></svg><span>Misura</span></button>
     <button id="undo" class="tbtn" title="Annulla (Ctrl+Z)"><svg><use href="#i-undo"/></svg><span>Annulla</span></button>
     <span class="vsep"></span>
-    <button id="save" class="tbtn" title="Salva il layout in un file JSON"><svg><use href="#i-save"/></svg><span>Salva</span></button>
-    <label class="tbtn" title="Apri un layout JSON salvato"><svg><use href="#i-open"/></svg><span>Apri</span><input type="file" id="jsonFile" accept=".json,application/json" hidden></label>
+    <button id="save" class="tbtn saveBtn" title="Salva il layout in un file JSON"><svg><use href="#i-save"/></svg><span>Salva</span></button>
+    <label class="tbtn" title="Apri un layout JSON salvato"><svg><use href="#i-open"/></svg><span>Apri</span><input type="file" class="jsonFile" accept=".json,application/json" hidden></label>
     <button id="shot" class="tbtn primary" title="Scarica un'immagine PNG della vista"><svg><use href="#i-camera"/></svg><span>Screenshot</span></button>
   </div>
 </header>
 
-<aside id="left">
+<aside id="left" class="sheet">
+  <div class="sheet-head"><span class="grab"></span><button class="ibtn sheet-close" aria-label="Chiudi"><svg><use href="#i-x"/></svg></button></div>
   <div class="tabs" role="tablist">
     <button class="tab on" data-tab="layout"><svg><use href="#i-layers"/></svg>Layout</button>
     <button class="tab" data-tab="add"><svg><use href="#i-plus"/></svg>Aggiungi</button>
@@ -122,6 +127,13 @@
       <p class="hint" id="ghostInfo">Accendi la scansione dalla barra in basso nella vista.</p>
     </section>
     <section class="card">
+      <h3>File del layout</h3>
+      <div class="btnrow">
+        <button class="btn saveBtn"><svg><use href="#i-save"/></svg>Salva</button>
+        <label class="btn"><svg><use href="#i-open"/></svg>Apri<input type="file" class="jsonFile" accept=".json,application/json" hidden></label>
+      </div>
+    </section>
+    <section class="card">
       <h3>Controlli dello spazio</h3>
       <label class="sw"><input type="checkbox" id="chk_collisions" checked><i></i>Collisioni</label>
       <label class="sw"><input type="checkbox" id="chk_doors" checked><i></i>Portiere 70 cm · bagagliaio 80 cm</label>
@@ -152,7 +164,7 @@
   </div>
 
   <div class="floatbar" id="barScan">
-    <button class="chip back" id="scanBack"><svg><use href="#i-arrow-left"/></svg>Torna al progetto</button>
+    <button class="chip back" id="scanBack"><svg><use href="#i-arrow-left"/></svg><span>Torna al progetto</span></button>
     <span class="vsep"></span>
     <label class="slider">Taglio soffitto <input type="range" id="scanCut" min="0.3" max="2.6" step="0.05" value="2.15"><output id="scanCutVal">2,15 m</output></label>
     <span class="vsep"></span>
@@ -178,7 +190,8 @@
   </div>
 </main>
 
-<aside id="right">
+<aside id="right" class="sheet">
+  <div class="sheet-head"><b>Dettagli</b><span class="grab"></span><button class="ibtn sheet-close" aria-label="Chiudi"><svg><use href="#i-x"/></svg></button></div>
   <section class="card status" id="issuesCard">
     <div class="status-head" id="issuesHead"></div>
     <ul id="issues" class="issues"></ul>
@@ -229,6 +242,15 @@
     <p class="lock-err" id="lockErr">&nbsp;</p>
   </form>
 </div>
+
+<nav id="mnav" aria-label="Navigazione">
+  <button data-go="scene" class="on"><svg><use href="#i-cube"/></svg>Garage</button>
+  <button data-go="layout"><svg><use href="#i-layers"/></svg>Layout</button>
+  <button data-go="add"><svg><use href="#i-plus"/></svg>Aggiungi</button>
+  <button data-go="objects"><svg><use href="#i-list"/></svg>Oggetti</button>
+  <button data-go="info"><svg><use href="#i-info"/></svg>Info<span class="nbadge" id="navBadge" hidden></span></button>
+</nav>
+<div id="scrim"></div>
 
 <script src="dist/app.js"></script>
 </body>
