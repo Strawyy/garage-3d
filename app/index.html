@@ -7,7 +7,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M5 11 12 6l7 5v7H5zM8 18v-4h8v4' fill='none' stroke='white' stroke-width='1.8' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body class="locked">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
     <symbol id="i-logo" viewBox="0 0 24 24"><path d="M3 10.5 12 4l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M7 21v-7h10v7M7 17h10"/></symbol>
@@ -75,8 +75,8 @@
     <section class="card">
       <h3>Disposizione auto</h3>
       <div class="seg seg-full" id="carSeg">
-        <button data-cfg="abituale">Abituale</button>
         <button data-cfg="ottimale">Ottimale</button>
+        <button data-cfg="abituale">Abituale</button>
         <button data-cfg="video">Video</button>
       </div>
       <p class="hint" id="carDesc"></p>
@@ -214,6 +214,21 @@
     </div>
   </section>
 </aside>
+
+<div id="lock" class="lock">
+  <form class="lock-card" id="lockForm" autocomplete="off">
+    <span class="logo big"><svg><use href="#i-logo"/></svg></span>
+    <h1>Garage 3D</h1>
+    <p>Inserisci il codice per entrare</p>
+    <div class="pin" id="pinBoxes">
+      <input inputmode="numeric" maxlength="1" aria-label="Cifra 1">
+      <input inputmode="numeric" maxlength="1" aria-label="Cifra 2">
+      <input inputmode="numeric" maxlength="1" aria-label="Cifra 3">
+      <input inputmode="numeric" maxlength="1" aria-label="Cifra 4">
+    </div>
+    <p class="lock-err" id="lockErr">&nbsp;</p>
+  </form>
+</div>
 
 <script src="dist/app.js"></script>
 </body>

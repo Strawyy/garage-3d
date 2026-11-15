@@ -26653,10 +26653,10 @@
   var CAR_SLOTS = {
     video: { "Mini One R56": { x: 2.925, z: 2.691, rot: 87.75 }, "Audi Q2": { x: 7.315, z: 1.757, rot: 0.25 }, "BMW 118d F20": { x: 7.045, z: 4.168, rot: 0 } },
     abituale: { "Audi Q2": { x: 2.925, z: 2.7, rot: 87.75 }, "Mini One R56": { x: 7.563, z: 1.757, rot: -179.75 }, "BMW 118d F20": { x: 7.045, z: 4.168, rot: 0 } },
-    ottimale: { "Audi Q2": { x: 2.79, z: 2.7, rot: 90 }, "Mini One R56": { x: 7.563, z: 1.715, rot: 180 }, "BMW 118d F20": { x: 7.045, z: 4.3, rot: 0 } }
+    ottimale: { "Audi Q2": { x: 2.74, z: 2.7, rot: 90 }, "Mini One R56": { x: 7.563, z: 1.715, rot: 180 }, "BMW 118d F20": { x: 7.045, z: 4.3, rot: 0 } }
   };
-  function carObjects(cfg = "abituale") {
-    const sl = CAR_SLOTS[cfg] || CAR_SLOTS.abituale;
+  function carObjects(cfg = "ottimale") {
+    const sl = CAR_SLOTS[cfg] || CAR_SLOTS.ottimale;
     return [
       o({
         name: "Mini One R56",
@@ -26759,8 +26759,8 @@
   ];
   function motos() {
     return [
-      o({ name: "Rieju MRT 50", type: "moto", kind: "moto", x: 0.74, z: 1.7, rot: -90, L: 2, P: 0.8, H: 1.15, color: "#d0202a" }),
-      o({ name: "Kawasaki ER-6n", type: "moto", kind: "moto", x: 0.78, z: 3.88, rot: -90, L: 2.105, P: 0.76, H: 1.1, color: "#e9e9e9" })
+      o({ name: "Rieju MRT 50", type: "moto", kind: "moto", x: 0.7, z: 1.7, rot: -90, L: 2, P: 0.8, H: 1.15, color: "#d0202a" }),
+      o({ name: "Kawasaki ER-6n", type: "moto", kind: "moto", x: 0.72, z: 3.88, rot: -90, L: 2.105, P: 0.76, H: 1.1, color: "#e9e9e9" })
     ];
   }
   var zone = (name, x, z, L, P, color) => o({ name, kind: "zona", x, z, L, P, H: 0.01, color });
@@ -26783,7 +26783,7 @@
         zone("Bici", 11.5, 5.4, 2.6, 1.2, "#27ae60"),
         zone("Officina", 12.8, 0.95, 1.1, 1.9, "#f39c12"),
         zone("Bidoni", 13, 2.95, 0.7, 2, "#f1c40f"),
-        o({ name: "Scaffale + mobiletti esistenti (accorciati)", kind: "scaffale", x: 1.07, z: 5.72, L: 1.9, P: 0.55, H: 1.8, color: "#9aa3ad", note: "Lasciare libero il bagagliaio dell'auto davanti al portone." }),
+        o({ name: "Scaffale + mobiletti esistenti (accorciati)", kind: "scaffale", x: 1.045, z: 5.72, L: 1.85, P: 0.55, H: 1.8, color: "#9aa3ad", note: "Lasciare libero il bagagliaio dell'auto davanti al portone." }),
         o({ name: "Scaffale nuovo 1 (prof. 36)", kind: "scaffale", x: 2.75, z: 5.82, L: 1, P: 0.36, H: 2, color: "#8e959c", note: "Profondit\xE0 max 36 cm: dietro al portellone della Q2." }),
         o({ name: "Scaffale nuovo 2", kind: "scaffale", x: 4.3, z: 5.75, L: 1, P: 0.5, H: 2, color: "#8e959c" }),
         o({ name: "Banco da lavoro (esistente)", kind: "banco", x: 13.05, z: 0.92, rot: 90, L: 1.8, P: 0.55, H: 0.9, color: "#c89b5e" }),
@@ -26814,8 +26814,8 @@
         zone("Stoccaggio est", 13, 3.9, 0.7, 2.6, "#9b59b6"),
         o({ name: "Banco da lavoro (spostato)", kind: "banco", x: 4.75, z: 5.7, L: 1.8, P: 0.6, H: 0.9, color: "#c89b5e", daily: false }),
         o({ name: "Pannello forato", kind: "pannello", x: 4.75, z: 5.97, L: 1.6, P: 0.05, H: 0.8, elev: 1.05, color: "#7f8c8d" }),
-        o({ name: "Mobiletti esistenti", kind: "armadio", x: 0.7, z: 5.75, L: 1.1, P: 0.5, H: 0.9, color: "#e8e8e8" }),
-        o({ name: "Armadio attrezzi", kind: "armadio", x: 1.66, z: 5.775, L: 0.8, P: 0.45, H: 1.8, color: "#6c7a89" }),
+        o({ name: "Mobiletti esistenti", kind: "armadio", x: 0.675, z: 5.75, L: 1.05, P: 0.5, H: 0.9, color: "#e8e8e8" }),
+        o({ name: "Armadio attrezzi", kind: "armadio", x: 1.61, z: 5.775, L: 0.8, P: 0.45, H: 1.8, color: "#6c7a89" }),
         o({ name: "Bidoni differenziata", kind: "bidoni", x: 13.03, z: 1.1, rot: 90, L: 2, P: 0.6, H: 1, color: "#e0c020", daily: true }),
         o({ name: "Scaffale est 1", kind: "scaffale", x: 13.08, z: 2.8, rot: 90, L: 1, P: 0.5, H: 2, color: "#8e959c" }),
         o({ name: "Scaffale est 2", kind: "scaffale", x: 13.08, z: 3.85, rot: 90, L: 1, P: 0.5, H: 2, color: "#8e959c" }),
@@ -26887,7 +26887,7 @@
     measures: [],
     pendingMeasure: null,
     ghostOpacity: 0.35,
-    carConfig: "abituale",
+    carConfig: "ottimale",
     scanOnly: false,
     // modalità "solo scansione"
     scanCut: 2.15,
@@ -28210,7 +28210,7 @@
   }
   var CAR_INFO = {
     abituale: ["Auto: disposizione abituale", "Q2 davanti al portone, Mini e BMW affiancate come al solito."],
-    ottimale: ["Auto: disposizione ottimale", "Q2 pi\xF9 verso le moto, Mini e BMW pi\xF9 distanziate (~86 cm tra le portiere)."],
+    ottimale: ["Auto: disposizione ottimale", "Q2 pi\xF9 vicina alle moto, Mini e BMW pi\xF9 distanziate (~86 cm tra le portiere)."],
     video: ["Auto: disposizione del video", "Come nel video: Mini davanti al portone, Q2 nel posto lato nord."]
   };
   function syncCarSeg() {
@@ -28415,6 +28415,90 @@
     renderer.render(scene, cam());
     updateLabels();
   }
+  var PIN_HASH = "5d8b88ed";
+  function pinHash(pin) {
+    let h = 2166136261;
+    for (const c of "garage3d:" + pin) {
+      h ^= c.charCodeAt(0);
+      h = Math.imul(h, 16777619) >>> 0;
+    }
+    return h.toString(16);
+  }
+  function lockScreen(onUnlock) {
+    const lock = $("#lock"), boxes = [...document.querySelectorAll("#pinBoxes input")], pinEl = $("#pinBoxes"), err = $("#lockErr");
+    const open = () => {
+      document.body.classList.remove("locked");
+      lock.classList.add("open");
+      setTimeout(() => lock.remove(), 400);
+      onUnlock();
+    };
+    let ok = false;
+    try {
+      ok = sessionStorage.getItem("garage3d-unlock") === PIN_HASH;
+    } catch (e) {
+    }
+    if (ok) {
+      lock.remove();
+      document.body.classList.remove("locked");
+      onUnlock();
+      return;
+    }
+    const check = () => {
+      const pin = boxes.map((b) => b.value).join("");
+      if (pin.length < 4) return;
+      if (pinHash(pin) === PIN_HASH) {
+        pinEl.classList.add("good");
+        err.innerHTML = "&nbsp;";
+        try {
+          sessionStorage.setItem("garage3d-unlock", PIN_HASH);
+        } catch (e) {
+        }
+        setTimeout(open, 250);
+      } else {
+        pinEl.classList.remove("bad");
+        void pinEl.offsetWidth;
+        pinEl.classList.add("bad");
+        err.textContent = "Codice errato, riprova";
+        setTimeout(() => {
+          boxes.forEach((b) => b.value = "");
+          boxes[0].focus();
+        }, 350);
+      }
+    };
+    boxes.forEach((b, i) => {
+      b.addEventListener("input", () => {
+        b.value = b.value.replace(/D/g, "").slice(-1);
+        pinEl.classList.remove("bad");
+        if (b.value && i < 3) boxes[i + 1].focus();
+        check();
+      });
+      b.addEventListener("keydown", (e) => {
+        if (e.key === "Backspace" && !b.value && i > 0) {
+          boxes[i - 1].value = "";
+          boxes[i - 1].focus();
+          e.preventDefault();
+        }
+        if (e.key === "ArrowLeft" && i > 0) boxes[i - 1].focus();
+        if (e.key === "ArrowRight" && i < 3) boxes[i + 1].focus();
+        e.stopPropagation();
+      });
+      b.addEventListener("paste", (e) => {
+        const t = (e.clipboardData.getData("text") || "").replace(/D/g, "").slice(0, 4);
+        if (!t) return;
+        e.preventDefault();
+        t.split("").forEach((c, k) => {
+          boxes[k].value = c;
+        });
+        boxes[Math.min(t.length, 3)].focus();
+        check();
+      });
+    });
+    $("#lockForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      check();
+    });
+    boxes[0].focus();
+  }
   buildRoom();
   buildDoor();
   state.objects = currentLayout(state.carConfig);
@@ -28425,7 +28509,7 @@
   renderProps();
   computeChecks();
   drawMeasures();
-  tryAutoLoadGhost();
+  lockScreen(tryAutoLoadGhost);
   loop();
   window.garage = { state, computeChecks, loadPreset, objGroup, roomGroup, ghostRoot, setGhostOpacity, select, setView, persp, controls, setCarConfig, setScanCut };
 })();

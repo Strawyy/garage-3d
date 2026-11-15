@@ -54,16 +54,17 @@ const o = (p) => ({ id: 'o' + (++_id), rot: 0, elev: 0, daily: false, fixed: fal
 // Q2 con lo stesso centro della Mini (muso a ~0,60 m dal portone); Mini entrata in avanti,
 // muso a est verso la porta di casa, con il muso dove la Q2 del video aveva il posteriore (X = 9,42)].
 // 'ottimale' = come 'abituale' ma parcheggiate meglio [proposta, da provare sul posto]:
-//   Q2 13,5 cm più verso le moto (resta 70+ cm per la portiera lato guida, verso le moto);
+//   Q2 18,5 cm più verso le moto (nelle proposte le moto stanno 4-6 cm più vicine al muro,
+//   così restano ~74 cm per la portiera lato guida della Q2, che dà verso le moto);
 //   Mini 4 cm verso nord (lato guida verso la parete nord: ~88 cm) e BMW 13 cm verso sud
 //   (lato guida verso la parete sud: ~82 cm) -> varco tra Mini e BMW da ~69 a ~86 cm.
 export const CAR_SLOTS = {
   video:    { 'Mini One R56': { x: 2.925, z: 2.691, rot: 87.75 }, 'Audi Q2': { x: 7.315, z: 1.757, rot: 0.25 }, 'BMW 118d F20': { x: 7.045, z: 4.168, rot: 0 } },
   abituale: { 'Audi Q2': { x: 2.925, z: 2.700, rot: 87.75 }, 'Mini One R56': { x: 7.563, z: 1.757, rot: -179.75 }, 'BMW 118d F20': { x: 7.045, z: 4.168, rot: 0 } },
-  ottimale: { 'Audi Q2': { x: 2.790, z: 2.700, rot: 90 }, 'Mini One R56': { x: 7.563, z: 1.715, rot: 180 }, 'BMW 118d F20': { x: 7.045, z: 4.300, rot: 0 } },
+  ottimale: { 'Audi Q2': { x: 2.740, z: 2.700, rot: 90 }, 'Mini One R56': { x: 7.563, z: 1.715, rot: 180 }, 'BMW 118d F20': { x: 7.045, z: 4.300, rot: 0 } },
 };
-export function carObjects(cfg = 'abituale') {
-  const sl = CAR_SLOTS[cfg] || CAR_SLOTS.abituale;
+export function carObjects(cfg = 'ottimale') {
+  const sl = CAR_SLOTS[cfg] || CAR_SLOTS.ottimale;
   return [
     o({ name: 'Mini One R56', type: 'car', kind: 'car', ...sl['Mini One R56'],
         L: 3.714, P: 1.683, H: 1.407, mirrors: 1.913, wheelbase: 2.467, doors: 3,
@@ -134,8 +135,8 @@ export const LIBRARY = [
 // ---------------------------------------------------------------------
 function motos() {
   return [
-    o({ name: 'Rieju MRT 50', type: 'moto', kind: 'moto', x: 0.74, z: 1.70, rot: -90, L: 2.0, P: 0.80, H: 1.15, color: '#d0202a' }),
-    o({ name: 'Kawasaki ER-6n', type: 'moto', kind: 'moto', x: 0.78, z: 3.88, rot: -90, L: 2.105, P: 0.76, H: 1.10, color: '#e9e9e9' }),
+    o({ name: 'Rieju MRT 50', type: 'moto', kind: 'moto', x: 0.70, z: 1.70, rot: -90, L: 2.0, P: 0.80, H: 1.15, color: '#d0202a' }),
+    o({ name: 'Kawasaki ER-6n', type: 'moto', kind: 'moto', x: 0.72, z: 3.88, rot: -90, L: 2.105, P: 0.76, H: 1.10, color: '#e9e9e9' }),
   ];
 }
 const zone = (name, x, z, L, P, color) => o({ name, kind: 'zona', x, z, L, P, H: 0.01, color });
@@ -154,7 +155,7 @@ export const PRESETS = {
     zone('Bici', 11.5, 5.4, 2.6, 1.2, '#27ae60'),
     zone('Officina', 12.8, 0.95, 1.1, 1.9, '#f39c12'),
     zone('Bidoni', 13.0, 2.95, 0.7, 2.0, '#f1c40f'),
-    o({ name: 'Scaffale + mobiletti esistenti (accorciati)', kind: 'scaffale', x: 1.07, z: 5.72, L: 1.9, P: 0.55, H: 1.8, color: '#9aa3ad', note: 'Lasciare libero il bagagliaio dell\'auto davanti al portone.' }),
+    o({ name: 'Scaffale + mobiletti esistenti (accorciati)', kind: 'scaffale', x: 1.045, z: 5.72, L: 1.85, P: 0.55, H: 1.8, color: '#9aa3ad', note: 'Lasciare libero il bagagliaio dell\'auto davanti al portone.' }),
     o({ name: 'Scaffale nuovo 1 (prof. 36)', kind: 'scaffale', x: 2.75, z: 5.82, L: 1.0, P: 0.36, H: 2.0, color: '#8e959c', note: 'Profondità max 36 cm: dietro al portellone della Q2.' }),
     o({ name: 'Scaffale nuovo 2', kind: 'scaffale', x: 4.30, z: 5.75, L: 1.0, P: 0.50, H: 2.0, color: '#8e959c' }),
     o({ name: 'Banco da lavoro (esistente)', kind: 'banco', x: 13.05, z: 0.92, rot: 90, L: 1.80, P: 0.55, H: 0.90, color: '#c89b5e' }),
@@ -179,8 +180,8 @@ export const PRESETS = {
     zone('Stoccaggio est', 13.0, 3.9, 0.7, 2.6, '#9b59b6'),
     o({ name: 'Banco da lavoro (spostato)', kind: 'banco', x: 4.75, z: 5.70, L: 1.8, P: 0.60, H: 0.90, color: '#c89b5e', daily: false }),
     o({ name: 'Pannello forato', kind: 'pannello', x: 4.75, z: 5.97, L: 1.6, P: 0.05, H: 0.8, elev: 1.05, color: '#7f8c8d' }),
-    o({ name: 'Mobiletti esistenti', kind: 'armadio', x: 0.70, z: 5.75, L: 1.1, P: 0.50, H: 0.9, color: '#e8e8e8' }),
-    o({ name: 'Armadio attrezzi', kind: 'armadio', x: 1.66, z: 5.775, L: 0.8, P: 0.45, H: 1.8, color: '#6c7a89' }),
+    o({ name: 'Mobiletti esistenti', kind: 'armadio', x: 0.675, z: 5.75, L: 1.05, P: 0.50, H: 0.9, color: '#e8e8e8' }),
+    o({ name: 'Armadio attrezzi', kind: 'armadio', x: 1.61, z: 5.775, L: 0.8, P: 0.45, H: 1.8, color: '#6c7a89' }),
     o({ name: 'Bidoni differenziata', kind: 'bidoni', x: 13.03, z: 1.10, rot: 90, L: 2.0, P: 0.60, H: 1.0, color: '#e0c020', daily: true }),
     o({ name: 'Scaffale est 1', kind: 'scaffale', x: 13.08, z: 2.80, rot: 90, L: 1.0, P: 0.50, H: 2.0, color: '#8e959c' }),
     o({ name: 'Scaffale est 2', kind: 'scaffale', x: 13.08, z: 3.85, rot: 90, L: 1.0, P: 0.50, H: 2.0, color: '#8e959c' }),

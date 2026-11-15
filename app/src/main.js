@@ -31,7 +31,7 @@ const state = {
   measures: [],
   pendingMeasure: null,
   ghostOpacity: 0.35,
-  carConfig: 'abituale',
+  carConfig: 'ottimale',
   scanOnly: false,         // modalità "solo scansione"
   scanCut: 2.15,           // quota di taglio della scansione (toglie il soffitto)
   preset: 'Stato attuale (rilievo)',
@@ -1044,7 +1044,7 @@ function screenshot() {
 }
 const CAR_INFO = {
   abituale: ['Auto: disposizione abituale', 'Q2 davanti al portone, Mini e BMW affiancate come al solito.'],
-  ottimale: ['Auto: disposizione ottimale', 'Q2 più verso le moto, Mini e BMW più distanziate (~86 cm tra le portiere).'],
+  ottimale: ['Auto: disposizione ottimale', 'Q2 più vicina alle moto, Mini e BMW più distanziate (~86 cm tra le portiere).'],
   video: ['Auto: disposizione del video', 'Come nel video: Mini davanti al portone, Q2 nel posto lato nord.'],
 };
 function syncCarSeg() {
@@ -1177,6 +1177,52 @@ function loop() {
   updateLabels();
 }
 
+// ---------------------------------------------------------------------
+//  Schermata con codice a 4 cifre. Protezione solo di facciata (il sito è
+//  statico): serve a non mostrare il box a chi apre il link per caso.
+// ---------------------------------------------------------------------
+const PIN_HASH = '5d8b88ed';
+function pinHash(pin) { let h = 0x811c9dc5; for (const c of 'garage3d:' + pin) { h ^= c.charCodeAt(0); h = Math.imul(h, 0x01000193) >>> 0; } return h.toString(16); }
+function lockScreen(onUnlock) {
+  const lock = $('#lock'), boxes = [...document.querySelectorAll('#pinBoxes input')], pinEl = $('#pinBoxes'), err = $('#lockErr');
+  const open = () => { document.body.classList.remove('locked'); lock.classList.add('open'); setTimeout(() => lock.remove(), 400); onUnlock(); };
+  let ok = false; try { ok = sessionStorage.getItem('garage3d-unlock') === PIN_HASH; } catch (e) { /* storage non disponibile */ }
+  if (ok) { lock.remove(); document.body.classList.remove('locked'); onUnlock(); return; }
+  const check = () => {
+    const pin = boxes.map((b) => b.value).join('');
+    if (pin.length < 4) return;
+    if (pinHash(pin) === PIN_HASH) {
+      pinEl.classList.add('good'); err.innerHTML = '&nbsp;';
+      try { sessionStorage.setItem('garage3d-unlock', PIN_HASH); } catch (e) { /* ignora */ }
+      setTimeout(open, 250);
+    } else {
+      pinEl.classList.remove('bad'); void pinEl.offsetWidth; pinEl.classList.add('bad');
+      err.textContent = 'Codice errato, riprova';
+      setTimeout(() => { boxes.forEach((b) => b.value = ''); boxes[0].focus(); }, 350);
+    }
+  };
+  boxes.forEach((b, i) => {
+    b.addEventListener('input', () => {
+      b.value = b.value.replace(/D/g, '').slice(-1);
+      pinEl.classList.remove('bad');
+      if (b.value && i < 3) boxes[i + 1].focus();
+      check();
+    });
+    b.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !b.value && i > 0) { boxes[i - 1].value = ''; boxes[i - 1].focus(); e.preventDefault(); }
+      if (e.key === 'ArrowLeft' && i > 0) boxes[i - 1].focus();
+      if (e.key === 'ArrowRight' && i < 3) boxes[i + 1].focus();
+      e.stopPropagation();
+    });
+    b.addEventListener('paste', (e) => {
+      const t = (e.clipboardData.getData('text') || '').replace(/D/g, '').slice(0, 4);
+      if (!t) return; e.preventDefault(); t.split('').forEach((c, k) => { boxes[k].value = c; }); boxes[Math.min(t.length, 3)].focus(); check();
+    });
+  });
+  $('#lockForm').addEventListener('submit', (e) => { e.preventDefault(); check(); });
+  boxes[0].focus();
+}
+
 // avvio
 buildRoom();
 buildDoor();
@@ -1188,6 +1234,6 @@ setView('3d');
 renderProps();
 computeChecks();
 drawMeasures();
-tryAutoLoadGhost();
+lockScreen(tryAutoLoadGhost); // la scansione si scarica solo dopo il codice
 loop();
 window.garage = { state, computeChecks, loadPreset, objGroup, roomGroup, ghostRoot, setGhostOpacity, select, setView, persp, controls, setCarConfig, setScanCut };
