@@ -1099,6 +1099,7 @@ function setCarConfig(cfg) {
 const PRESET_INFO = {
   'Stato attuale (rilievo)': ['•', 'Stato attuale', 'Com\'è oggi il box, ricostruito dalla scansione.'],
   'Proposta vuota – Da zero': ['0', 'Da zero', 'Solo le tre auto: aggiungi tu tutto il resto dalla scheda Aggiungi.'],
+  'Proposta D – Su misura': ['D', 'Su misura (dalle tue risposte)', 'E-bike a terra con presa vicino, bidoni e scope alla porta di casa, armadi bassi dietro l\'auto del portone, stagionali a soffitto.'],
   'Proposta A – Riordino economico': ['A', 'Riordino economico', 'Spesa minima: scaffali nuovi, bici appese al muro, rack a soffitto.'],
   'Proposta B – Officina vicino al portone': ['B', 'Officina vicino al portone', 'Banco da lavoro sul lato sud, bici e scaffali sul lato est.'],
   'Proposta C – Parete attrezzata + armadi chiusi': ['C', 'Parete attrezzata + armadi', 'Armadi chiusi sul lato sud, banco e attrezzi sulla parete est.'],
