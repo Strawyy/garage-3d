@@ -193,6 +193,57 @@ export const PRESETS = {
     o({ name: 'Mensola alta corridoio (cose leggere)', kind: 'mensola', x: 7.30, z: 0.15, L: 3.6, P: 0.30, H: 0.04, elev: 1.95, color: '#b5895a', note: 'Sopra la testa, sul passaggio di tutti: solo scatole leggere e rare.' }),
   ]; },
 
+  // Proposta E – variante della D su indicazione dell'utente (16/11/2026): il passaggio a piedi
+  // è TRA Mini e BMW, la striscia tra la Mini e la parete nord non serve come corridoio.
+  // Parete nord usata (tranne la portiera lato guida della Mini); bidoni al loro posto storico,
+  // banco al suo posto originale (parete est, vicino casa), scaffale a L nell'angolo sud-est.
+  'Proposta E – Su misura, parete nord usata': (cfg) => { _id = 700; return [
+    ...carObjects(cfg), ...motos(),
+    o({ name: 'Corridoio auto davanti ↔ frontali', kind: 'corridoio', x: 4.32, z: 2.90, rot: 90, L: 4.60, P: 0.80, H: 0.01, color: '#2e86de' }),
+    o({ name: 'Corridoio tra Mini e BMW', kind: 'corridoio', x: 8.075, z: 2.987, L: 6.65, P: 0.80, H: 0.01, color: '#2e86de', note: 'Tra le carrozzerie ~86 cm; con gli specchietti aperti ~64 cm: meglio chiuderli.' }),
+    o({ name: 'Corridoio verso porta di casa', kind: 'corridoio', x: 11.80, z: 1.31, rot: 90, L: 2.58, P: 0.80, H: 0.01, color: '#2e86de' }),
+    zone('Moto (primavera-estate)', 0.75, 2.80, 1.0, 4.4, '#e74c3c'),
+    zone('Giardino, esterno, scatole', 2.30, 5.80, 3.8, 0.4, '#9b59b6'),
+    zone('Pulizia + prodotti auto', 6.20, 0.25, 1.9, 0.5, '#9b59b6'),
+    zone('Bidoni', 10.125, 0.37, 2.15, 0.7, '#f1c40f'),
+    zone('Officina', 12.30, 1.45, 0.9, 1.8, '#f39c12'),
+    zone('Bici', 11.30, 4.20, 2.2, 3.2, '#27ae60'),
+    zone('Scaffale a L', 12.70, 5.40, 1.2, 1.2, '#9b59b6'),
+
+    // --- Sud-ovest, dietro l'auto davanti al portone (prof. 36 cm per il portellone)
+    o({ name: 'Gomme invernali (4) su carrello', kind: 'box', x: 0.45, z: 5.60, L: 0.65, P: 0.65, H: 0.95, color: '#333333', note: 'Pesanti e stagionali: in basso e vicino al portone. Carrello/torre 30–60 €.' }),
+    o({ name: 'Armadio giardinaggio', kind: 'armadio', x: 1.25, z: 5.82, L: 0.8, P: 0.36, H: 2.0, color: '#6c7a89', note: 'Prof. 36 cm. Attrezzi da giardino: escono dal portone.' }),
+    o({ name: 'Armadio infiammabili (metallico)', kind: 'armadio', x: 2.07, z: 5.82, L: 0.8, P: 0.36, H: 2.0, color: '#6c7a89', note: 'Vernici, solventi, taniche: chiusi e lontani dalle e-bike in carica (che stanno a est).' }),
+    o({ name: 'Scaffale esterno / sport / campeggio', kind: 'scaffale', x: 2.98, z: 5.82, L: 1.0, P: 0.36, H: 2.0, color: '#8e959c', note: 'Box trasparenti etichettati, primo ripiano a 10-15 cm da terra (acqua delle auto in inverno).' }),
+    o({ name: 'Idropulitrice + portabici da gancio', kind: 'box', x: 4.57, z: 5.72, L: 0.50, P: 0.50, H: 1.0, color: '#c9a66b', note: 'Il portabici del gancio traino della Q2 sta dietro al suo bagagliaio.' }),
+    o({ name: 'Scala (appesa in orizzontale)', kind: 'box', x: 0.32, z: 2.60, rot: 90, L: 1.80, P: 0.15, H: 0.45, elev: 1.40, color: '#c0c0c0', note: 'Su due staffe sopra le moto.' }),
+
+    // --- Parete nord, tra quadro e portiera della Mini: vicino al rubinetto
+    o({ name: 'Armadio pulizia (scope, secchi, aspirapolvere)', kind: 'armadio', x: 5.67, z: 0.20, L: 0.8, P: 0.36, H: 1.8, color: '#6c7a89', note: 'Accanto al rubinetto (vicino al quadro): tergipavimento per l\'acqua delle auto, secchi, aspirapolvere. Il quadro resta libero.' }),
+    o({ name: 'Scaffale prodotti auto', kind: 'scaffale', x: 6.65, z: 0.17, L: 1.0, P: 0.30, H: 2.0, color: '#8e959c', note: 'Si raggiunge dal lato del bagagliaio della Mini. Oltre resta libera la portiera lato guida della Mini (~70 cm).' }),
+
+    // --- Parete nord, oltre il muso della Mini: bidoni al loro posto, ordinati
+    o({ name: 'Bidoni differenziata (7)', kind: 'bidoni', x: 10.125, z: 0.37, L: 2.15, P: 0.70, H: 1.0, color: '#e0c020', daily: true, note: 'Al posto di oggi ma in fila ordinata. Il primo bidone (x < 9,42) è accanto al muso dell\'auto: metterci quello usato meno (es. vetro). Davanti resta libero l\'accesso alla porta di casa.' }),
+    o({ name: 'Armadietto scope (vicino casa)', kind: 'armadio', x: 12.88, z: 0.25, L: 0.8, P: 0.45, H: 1.8, color: '#6c7a89', note: 'Scope e paletta per tutti i giorni, subito oltre la porta di casa.' }),
+
+    // --- Parete est: banco al posto originale, poi bici, poi scaffale a L
+    o({ name: 'Banco da lavoro (posto originale)', kind: 'banco', x: 13.055, z: 1.45, rot: 90, L: 1.80, P: 0.55, H: 0.90, color: '#c89b5e', note: 'Davanti c\'è tutto lo spazio libero dell\'incrocio per lavorare.' }),
+    o({ name: 'Pannello forato (attrezzi + pompe bici)', kind: 'pannello', x: 13.30, z: 1.45, rot: 90, L: 1.50, P: 0.05, H: 0.80, elev: 1.05, color: '#7f8c8d', note: 'Attrezzi, le 2 pompe e gli attrezzi bici.' }),
+    o({ name: 'Mensola sopra il banco', kind: 'mensola', x: 13.18, z: 1.45, rot: 90, L: 1.60, P: 0.30, H: 0.04, elev: 1.95, color: '#b5895a', note: 'Attrezzi moto in una cassetta e scorte del banco.' }),
+    o({ name: 'Presa nuova per e-bike e banco', kind: 'pannello', x: 13.30, z: 2.47, rot: 90, L: 0.12, P: 0.05, H: 0.12, elev: 1.10, color: '#ffffff', note: 'Elettricista: linea in canalina dal quadro (circa 100-200 €). Serve al banco e per caricare le e-bike.' }),
+    o({ name: 'Rastrelliera 2 e-bike (a terra)', kind: 'rastrelliera', x: 12.405, z: 3.35, rot: 90, L: 1.40, P: 1.85, H: 1.10, color: '#2d8a4e', daily: true, note: 'E-bike 23-28 kg: a terra, senza sollevarle. 40-80 €.' }),
+    o({ name: 'Bici da corsa (esposta)', kind: 'gancio_o', x: 13.13, z: 3.40, rot: 90, L: 1.70, P: 0.40, H: 0.80, elev: 1.45, color: '#b03030', note: 'Il cimelio, ad altezza occhi sopra le e-bike.' }),
+    o({ name: 'MTB (più usata) – gancio', kind: 'gancio_v', x: 10.40, z: 5.42, rot: 180, L: 0.45, P: 1.15, H: 1.90, color: '#2d8a4e', daily: true }),
+    o({ name: 'MTB (meno usata) – gancio', kind: 'gancio_v', x: 10.95, z: 5.42, rot: 180, L: 0.45, P: 1.15, H: 1.90, color: '#7fa88c' }),
+    o({ name: 'Graziella – gancio', kind: 'gancio_v', x: 11.50, z: 5.42, rot: 180, L: 0.45, P: 1.15, H: 1.90, color: '#7fa88c' }),
+    o({ name: 'Scaffale a L – lato est', kind: 'scaffale', x: 13.08, z: 5.10, rot: 90, L: 1.70, P: 0.50, H: 2.0, color: '#8e959c', note: 'Scatoloni rimasti dopo la cernita, in box etichettati.' }),
+    o({ name: 'Scaffale a L – lato sud', kind: 'scaffale', x: 12.32, z: 5.75, L: 0.95, P: 0.50, H: 2.0, color: '#8e959c', note: 'Angolo: si raggiunge dallo spazio davanti ai ganci delle bici.' }),
+
+    // --- In alto: stagionali
+    o({ name: 'Rack soffitto sopra posto nord', kind: 'soppalco', x: 7.60, z: 1.715, L: 2.40, P: 1.20, H: 0.05, elev: 1.80, color: '#a0a6ad', note: 'Dondolo smontato, gommone sgonfio. Verificare i tubi dei cavi sul soffitto.' }),
+    o({ name: 'Rack soffitto sopra BMW', kind: 'soppalco', x: 6.60, z: 4.30, L: 2.40, P: 1.20, H: 0.05, elev: 1.80, color: '#a0a6ad', note: 'Materassi gonfiabili, decorazioni, cose rare.' }),
+  ]; },
+
   'Proposta A – Riordino economico': (cfg) => { _id = 200; return [
     ...carObjects(cfg), ...motos(), ...defaultChecks(),
     zone('Zona moto', 0.9, 2.7, 1.3, 4.6, '#e74c3c'),
