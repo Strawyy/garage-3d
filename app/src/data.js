@@ -150,7 +150,7 @@ export const PRESETS = {
 
   // Proposta D – costruita sulle risposte al questionario (domande disposizione.txt, 16/11/2026).
   // Ovest/sud-ovest (vicino al portone): moto, cose che vanno fuori o in auto.
-  // Est (vicino alla porta di casa): bidoni, bici, banco. Soffitto: stagionali.
+  // Est (vicino alla porta di casa): bidoni, bici, banco.
   'Proposta D – Su misura': (cfg) => { _id = 600; return [
     ...carObjects(cfg), ...motos(), ...defaultChecks(),
     o({ name: 'Corridoio casa → bici e banco', kind: 'corridoio', x: 10.80, z: 2.65, rot: 90, L: 3.60, P: 0.80, H: 0.01, color: '#2e86de' }),
@@ -187,9 +187,7 @@ export const PRESETS = {
     o({ name: 'Pannello forato (attrezzi + pompe bici)', kind: 'pannello', x: 13.30, z: 5.08, rot: 90, L: 1.50, P: 0.05, H: 0.80, elev: 1.05, color: '#7f8c8d', note: 'Attrezzi ordinati, le 2 pompe e gli attrezzi bici appesi qui: la zona bici è a un passo.' }),
     o({ name: 'Mensola sopra il banco', kind: 'mensola', x: 13.18, z: 5.18, rot: 90, L: 1.60, P: 0.30, H: 0.04, elev: 1.95, color: '#b5895a', note: 'Attrezzi moto (ne basta poco spazio, in una cassetta) e scorte del banco.' }),
 
-    // --- In alto: cose rare e stagionali
-    o({ name: 'Rack soffitto sopra posto nord', kind: 'soppalco', x: 7.60, z: 1.715, L: 2.40, P: 1.20, H: 0.05, elev: 1.80, color: '#a0a6ad', note: 'Dondolo smontato, gommone sgonfio. Prima di forare verificare i tubi dei cavi sul soffitto.' }),
-    o({ name: 'Rack soffitto sopra BMW', kind: 'soppalco', x: 6.60, z: 4.30, L: 2.40, P: 1.20, H: 0.05, elev: 1.80, color: '#a0a6ad', note: 'Materassi gonfiabili, decorazioni, cose da tenere ma rare.' }),
+    // --- In alto: cose rare e leggere
     o({ name: 'Mensola alta corridoio (cose leggere)', kind: 'mensola', x: 7.30, z: 0.15, L: 3.6, P: 0.30, H: 0.04, elev: 1.95, color: '#b5895a', note: 'Sopra la testa, sul passaggio di tutti: solo scatole leggere e rare.' }),
   ]; },
 
@@ -238,10 +236,6 @@ export const PRESETS = {
     o({ name: 'Graziella – gancio', kind: 'gancio_v', x: 11.50, z: 5.42, rot: 180, L: 0.45, P: 1.15, H: 1.90, color: '#7fa88c' }),
     o({ name: 'Scaffale a L – lato est', kind: 'scaffale', x: 13.08, z: 5.10, rot: 90, L: 1.70, P: 0.50, H: 2.0, color: '#8e959c', note: 'Scatoloni rimasti dopo la cernita, in box etichettati.' }),
     o({ name: 'Scaffale a L – lato sud', kind: 'scaffale', x: 12.32, z: 5.75, L: 0.95, P: 0.50, H: 2.0, color: '#8e959c', note: 'Angolo: si raggiunge dallo spazio davanti ai ganci delle bici.' }),
-
-    // --- In alto: stagionali
-    o({ name: 'Rack soffitto sopra posto nord', kind: 'soppalco', x: 7.60, z: 1.715, L: 2.40, P: 1.20, H: 0.05, elev: 1.80, color: '#a0a6ad', note: 'Dondolo smontato, gommone sgonfio. Verificare i tubi dei cavi sul soffitto.' }),
-    o({ name: 'Rack soffitto sopra BMW', kind: 'soppalco', x: 6.60, z: 4.30, L: 2.40, P: 1.20, H: 0.05, elev: 1.80, color: '#a0a6ad', note: 'Materassi gonfiabili, decorazioni, cose rare.' }),
   ]; },
 
   'Proposta A – Riordino economico': (cfg) => { _id = 200; return [

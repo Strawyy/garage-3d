@@ -26774,7 +26774,7 @@
     },
     // Proposta D – costruita sulle risposte al questionario (domande disposizione.txt, 16/11/2026).
     // Ovest/sud-ovest (vicino al portone): moto, cose che vanno fuori o in auto.
-    // Est (vicino alla porta di casa): bidoni, bici, banco. Soffitto: stagionali.
+    // Est (vicino alla porta di casa): bidoni, bici, banco.
     "Proposta D \u2013 Su misura": (cfg) => {
       _id = 600;
       return [
@@ -26810,9 +26810,7 @@
         o({ name: "Banco da lavoro (esistente)", kind: "banco", x: 13.055, z: 5.08, rot: 90, L: 1.8, P: 0.55, H: 0.9, color: "#c89b5e", note: "Davanti resta circa 1 m libero per lavorare." }),
         o({ name: "Pannello forato (attrezzi + pompe bici)", kind: "pannello", x: 13.3, z: 5.08, rot: 90, L: 1.5, P: 0.05, H: 0.8, elev: 1.05, color: "#7f8c8d", note: "Attrezzi ordinati, le 2 pompe e gli attrezzi bici appesi qui: la zona bici \xE8 a un passo." }),
         o({ name: "Mensola sopra il banco", kind: "mensola", x: 13.18, z: 5.18, rot: 90, L: 1.6, P: 0.3, H: 0.04, elev: 1.95, color: "#b5895a", note: "Attrezzi moto (ne basta poco spazio, in una cassetta) e scorte del banco." }),
-        // --- In alto: cose rare e stagionali
-        o({ name: "Rack soffitto sopra posto nord", kind: "soppalco", x: 7.6, z: 1.715, L: 2.4, P: 1.2, H: 0.05, elev: 1.8, color: "#a0a6ad", note: "Dondolo smontato, gommone sgonfio. Prima di forare verificare i tubi dei cavi sul soffitto." }),
-        o({ name: "Rack soffitto sopra BMW", kind: "soppalco", x: 6.6, z: 4.3, L: 2.4, P: 1.2, H: 0.05, elev: 1.8, color: "#a0a6ad", note: "Materassi gonfiabili, decorazioni, cose da tenere ma rare." }),
+        // --- In alto: cose rare e leggere
         o({ name: "Mensola alta corridoio (cose leggere)", kind: "mensola", x: 7.3, z: 0.15, L: 3.6, P: 0.3, H: 0.04, elev: 1.95, color: "#b5895a", note: "Sopra la testa, sul passaggio di tutti: solo scatole leggere e rare." })
       ];
     },
@@ -26859,10 +26857,7 @@
         o({ name: "MTB (meno usata) \u2013 gancio", kind: "gancio_v", x: 10.95, z: 5.42, rot: 180, L: 0.45, P: 1.15, H: 1.9, color: "#7fa88c" }),
         o({ name: "Graziella \u2013 gancio", kind: "gancio_v", x: 11.5, z: 5.42, rot: 180, L: 0.45, P: 1.15, H: 1.9, color: "#7fa88c" }),
         o({ name: "Scaffale a L \u2013 lato est", kind: "scaffale", x: 13.08, z: 5.1, rot: 90, L: 1.7, P: 0.5, H: 2, color: "#8e959c", note: "Scatoloni rimasti dopo la cernita, in box etichettati." }),
-        o({ name: "Scaffale a L \u2013 lato sud", kind: "scaffale", x: 12.32, z: 5.75, L: 0.95, P: 0.5, H: 2, color: "#8e959c", note: "Angolo: si raggiunge dallo spazio davanti ai ganci delle bici." }),
-        // --- In alto: stagionali
-        o({ name: "Rack soffitto sopra posto nord", kind: "soppalco", x: 7.6, z: 1.715, L: 2.4, P: 1.2, H: 0.05, elev: 1.8, color: "#a0a6ad", note: "Dondolo smontato, gommone sgonfio. Verificare i tubi dei cavi sul soffitto." }),
-        o({ name: "Rack soffitto sopra BMW", kind: "soppalco", x: 6.6, z: 4.3, L: 2.4, P: 1.2, H: 0.05, elev: 1.8, color: "#a0a6ad", note: "Materassi gonfiabili, decorazioni, cose rare." })
+        o({ name: "Scaffale a L \u2013 lato sud", kind: "scaffale", x: 12.32, z: 5.75, L: 0.95, P: 0.5, H: 2, color: "#8e959c", note: "Angolo: si raggiunge dallo spazio davanti ai ganci delle bici." })
       ];
     },
     "Proposta A \u2013 Riordino economico": (cfg) => {
@@ -28382,7 +28377,7 @@
   var PRESET_INFO = {
     "Stato attuale (rilievo)": ["\u2022", "Stato attuale", "Com'\xE8 oggi il box, ricostruito dalla scansione."],
     "Proposta vuota \u2013 Da zero": ["0", "Da zero", "Solo le tre auto: aggiungi tu tutto il resto dalla scheda Aggiungi."],
-    "Proposta D \u2013 Su misura": ["D", "Su misura (dalle tue risposte)", "E-bike a terra con presa vicino, bidoni e scope alla porta di casa, armadi bassi dietro l'auto del portone, stagionali a soffitto."],
+    "Proposta D \u2013 Su misura": ["D", "Su misura (dalle tue risposte)", "E-bike a terra con presa vicino, bidoni e scope alla porta di casa, armadi bassi dietro l'auto del portone."],
     "Proposta E \u2013 Su misura, parete nord usata": ["E", "Su misura, parete nord usata", "Si passa tra Mini e BMW: bidoni al loro posto, banco al posto originale, scaffale a L a sud-est."],
     "Proposta A \u2013 Riordino economico": ["A", "Riordino economico", "Spesa minima: scaffali nuovi, bici appese al muro, rack a soffitto."],
     "Proposta B \u2013 Officina vicino al portone": ["B", "Officina vicino al portone", "Banco da lavoro sul lato sud, bici e scaffali sul lato est."],
